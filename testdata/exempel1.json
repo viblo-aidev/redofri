@@ -1,0 +1,326 @@
+{
+  "company": {
+    "name": "Exempel 1 AB",
+    "orgNr": "556999-9999"
+  },
+  "fiscalYear": {
+    "startDate": "2016-01-01",
+    "endDate": "2016-12-31"
+  },
+  "meta": {
+    "language": "sv",
+    "country": "SE",
+    "currency": "SEK",
+    "amountFormat": "NORMALFORM",
+    "entryPoint": "risbs",
+    "software": "Redofri",
+    "softwareVersion": "0.1.0"
+  },
+  "certification": {
+    "confirmationText": "Jag intygar att resultaträkningen och balansräkningen har fastställts på årsstämma",
+    "meetingDate": "2017-03-21",
+    "dispositionDecision": "Årsstämman beslöt att godkänna styrelsens förslag till vinstdisposition.",
+    "originalContentCertification": "Jag intygar att innehållet i dessa elektroniska handlingar överensstämmer med originalen och att originalen undertecknats av samtliga personer som enligt lag ska underteckna dessa.",
+    "electronicSignatureLabel": "Elektroniskt underskriven av",
+    "signatory": {
+      "firstName": "Karl",
+      "lastName": "Karlsson",
+      "role": "Styrelseledamot"
+    },
+    "signingDate": "2017-03-21"
+  },
+  "managementReport": {
+    "introText": "Styrelsen och verkställande direktören avger följande årsredovisning",
+    "businessDescription": "<p>Bolaget tillverkar och säljer produkter inom skogsnäringen.\n    De viktigaste produkterna är arbetsverktyg inom skogsbruket.</p>\n<p>Bolaget har sitt säte i Sundsvall, Västernorrlands län, där bolaget även har sin butik.</p>",
+    "significantEvents": "Under året har planering påbörjats för utbyggnad av bolagets lokaler. Planeringen innefattr bl.a. projektering och finansiering. Bolaget har också undersökt möjligheten att starta e-handel.",
+    "multiYearOverview": {
+      "years": [
+        {
+          "year": "2016",
+          "netSales": 2650000,
+          "resultAfterFinancialItems": 1485000,
+          "solidity": "33.7"
+        },
+        {
+          "year": "2015",
+          "netSales": 2250000,
+          "resultAfterFinancialItems": 1184000,
+          "solidity": "39.1"
+        },
+        {
+          "year": "2014",
+          "netSales": 1100000,
+          "resultAfterFinancialItems": 150000,
+          "solidity": "30.0"
+        },
+        {
+          "year": "2013",
+          "netSales": 0,
+          "resultAfterFinancialItems": 0,
+          "solidity": "100"
+        }
+      ],
+      "comment": "Bolaget bildades under 2013, men försäljningen inleddes hösten 2014."
+    },
+    "equityChanges": {
+      "openingShareCapital": 100000,
+      "openingReserveFund": 5000,
+      "openingRetainedEarnings": 1011000,
+      "openingNetIncome": 1099000,
+      "openingTotal": 2215000,
+      "dividendNetIncome": 1099000,
+      "dividendTotal": 1099000,
+      "yearResultNetIncome": 1274000,
+      "yearResultTotal": 1274000,
+      "closingShareCapital": 100000,
+      "closingReserveFund": 5000,
+      "closingRetainedEarnings": 1011000,
+      "closingNetIncome": 1274000,
+      "closingTotal": 2390000
+    },
+    "profitDisposition": {
+      "retainedEarnings": 1011000,
+      "netIncome": 1274000,
+      "totalAvailable": 2285000,
+      "dividend": 285000,
+      "carriedForward": 2000000,
+      "totalDisposition": 2285000
+    },
+    "boardDividendStatement": "<p>Den föreslagna utdelningen reducerar bolagets soliditet till 31 procent.\n    Soliditeten är mot bakgrund av att bolagets verksamhet fortsatt bedrivs med lönsamhet betryggande.\n    Likviditeten i bolaget bedöms kunna upprätthållas på en likaledes betryggande nivå.</p>\n<p>Styrelsens uppfattning är att den föreslagna utdelningen ej hindrar bolaget från att fullgöra\n    sina förpliktelser på kort och lång sikt, ej heller att fullgöra erforderliga investeringar.\n    Den föreslagna utdelningen kan därmed försvaras med hänsyn till vad som anförs i\n    ABL 17 kap. 3 § 2 st. (försiktighetsregeln).</p>"
+  },
+  "incomeStatement": {
+    "revenue": {
+      "netSales": { "current": 2650000, "previous": 2250000 },
+      "inventoryChange": { "current": 700000, "previous": 1125000 },
+      "otherOperatingIncome": { "current": 377000, "previous": 1000000 },
+      "totalRevenue": { "current": 3727000, "previous": 4375000 }
+    },
+    "expenses": {
+      "rawMaterials": { "current": 1520000, "previous": 1267000 },
+      "tradingGoods": { "current": 308000, "previous": 1081000 },
+      "otherExternalExpenses": { "current": 499000, "previous": 730000 },
+      "personnelExpenses": { "current": 650000, "previous": 653000 },
+      "personnelExpensesNote": 2,
+      "depreciationAmortization": { "current": 340000, "previous": 210000 },
+      "otherOperatingExpenses": { "current": 205000, "previous": 170000 },
+      "totalExpenses": { "current": 3522000, "previous": 4111000 }
+    },
+    "operatingResult": { "current": 205000, "previous": 264000 },
+    "financialItems": {
+      "resultOtherFinancialAssets": { "current": 1543000, "previous": 1103000 },
+      "otherInterestIncome": { "current": 12000, "previous": 7000 },
+      "interestExpenses": { "current": 275000, "previous": 190000 },
+      "totalFinancialItems": { "current": 1280000, "previous": 920000 }
+    },
+    "resultAfterFinancialItems": { "current": 1485000, "previous": 1184000 },
+    "appropriations": {
+      "taxAllocationReserve": { "current": 70000, "previous": 25000 },
+      "excessDepreciation": { "current": 51000, "previous": 30000 },
+      "totalAppropriations": { "current": 121000, "previous": 55000 }
+    },
+    "resultBeforeTax": { "current": 1364000, "previous": 1129000 },
+    "tax": {
+      "incomeTax": { "current": 90000, "previous": 30000 }
+    },
+    "netResult": { "current": 1274000, "previous": 1099000 }
+  },
+  "balanceSheet": {
+    "assets": {
+      "fixedAssets": {
+        "tangible": {
+          "buildingsAndLand": { "current": 1620000, "previous": 1450000 },
+          "buildingsAndLandNote": 3,
+          "machineryAndEquipment": { "current": 860000, "previous": 260000 },
+          "machineryAndEquipmentNote": 4,
+          "fixturesAndFittings": { "current": 240000, "previous": 100000 },
+          "fixturesAndFittingsNote": 5,
+          "totalTangible": { "current": 2720000, "previous": 1810000 }
+        },
+        "financial": {
+          "otherLongTermSecurities": { "current": 2000000, "previous": 2250000 },
+          "otherLongTermSecuritiesNote": 6,
+          "totalFinancial": { "current": 2000000, "previous": 2250000 }
+        },
+        "totalFixedAssets": { "current": 4720000, "previous": 4060000 }
+      },
+      "currentAssets": {
+        "inventory": {
+          "rawMaterials": { "current": 510000, "previous": 350000 },
+          "workInProgress": { "current": 240000, "previous": 150000 },
+          "finishedGoods": { "current": 750000, "previous": 300000 },
+          "totalInventory": { "current": 1500000, "previous": 800000 }
+        },
+        "shortTermReceivables": {
+          "tradeReceivables": { "current": 1393000, "previous": 937000 },
+          "otherReceivables": { "current": 20000, "previous": 15000 },
+          "prepaidExpenses": { "current": 30000, "previous": 25000 },
+          "totalShortTermReceivables": { "current": 1443000, "previous": 977000 }
+        },
+        "cashAndBank": {
+          "cashAndBankExcl": { "current": 110000, "previous": 170000 },
+          "totalCashAndBank": { "current": 110000, "previous": 170000 }
+        },
+        "totalCurrentAssets": { "current": 3053000, "previous": 1947000 }
+      },
+      "totalAssets": { "current": 7773000, "previous": 6007000 }
+    },
+    "equityAndLiabilities": {
+      "equity": {
+        "shareCapital": { "current": 100000, "previous": 100000 },
+        "reserveFund": { "current": 5000, "previous": 5000 },
+        "totalRestrictedEquity": { "current": 105000, "previous": 105000 },
+        "retainedEarnings": { "current": 1011000, "previous": 1011000 },
+        "netIncome": { "current": 1274000, "previous": 1099000 },
+        "totalUnrestrictedEquity": { "current": 2285000, "previous": 2110000 },
+        "totalEquity": { "current": 2390000, "previous": 2215000 }
+      },
+      "untaxedReserves": {
+        "taxAllocationReserves": { "current": 169000, "previous": 99000 },
+        "accumulatedExcessDepreciation": { "current": 121000, "previous": 70000 },
+        "totalUntaxedReserves": { "current": 290000, "previous": 169000 }
+      },
+      "provisions": {
+        "pensionProvisions": { "current": 770000, "previous": 650000 },
+        "otherProvisions": { "current": 100000, "previous": 65000 },
+        "totalProvisions": { "current": 870000, "previous": 715000 }
+      },
+      "longTermLiabilities": {
+        "longTermLiabilitiesNote": 7,
+        "bankLoans": { "current": 2193000, "previous": 1513000 },
+        "bankLoansNotes": [8, 10],
+        "otherLongTermLiabilities": { "current": 100000, "previous": 180000 },
+        "totalLongTermLiabilities": { "current": 2293000, "previous": 1693000 }
+      },
+      "shortTermLiabilities": {
+        "tradePayables": { "current": 855000, "previous": 641000 },
+        "taxLiabilities": { "current": 130000, "previous": 35000 },
+        "otherShortTermLiabilities": { "current": 492000, "previous": 315000 },
+        "otherShortTermLiabilitiesNote": 10,
+        "accruedExpenses": { "current": 453000, "previous": 224000 },
+        "totalShortTermLiabilities": { "current": 1930000, "previous": 1215000 }
+      },
+      "totalEquityAndLiabilities": { "current": 7773000, "previous": 6007000 }
+    }
+  },
+  "notes": {
+    "accountingPolicies": {
+      "noteNumber": 1,
+      "description": "Årsredovisningen är upprättad i enlighet med årsredovisningslagen och BFNAR 2016:10\n    Årsredovisning i mindre företag.",
+      "depreciations": [
+        {
+          "category": "Maskiner och andra tekniska anläggningar",
+          "concept": "se-gen-base:AvskrivningarMateriellaAnlaggningstillgangarMaskinerAndraTekniskaAnlaggningarAr",
+          "years": 5
+        },
+        {
+          "category": "Inventarier, verktyg och installationer",
+          "concept": "se-gen-base:AvskrivningarMateriellaAnlaggningstillgangarInventarierVerktygInstallationerAr",
+          "years": 4
+        },
+        {
+          "category": "Byggnader och mark",
+          "concept": "se-gen-base:AvskrivningarMateriellaAnlaggningstillgangarByggnaderAr",
+          "years": 25
+        }
+      ],
+      "depreciationComment": "Vid fastställande av det avskrivningsbara beloppet för dessa har hänsyn tagits till beräknat restvärde.",
+      "manufacturedGoodsPolicy": "Företaget räknar in indirekta tillverkningskostnader i anskaffningsvärdet för egentillverkade varor."
+    },
+    "employees": {
+      "noteNumber": 2,
+      "averageEmployees": { "current": 2, "previous": 2 }
+    },
+    "fixedAssetNotes": [
+      {
+        "noteNumber": 3,
+        "title": "Byggnader och mark",
+        "conceptPrefix": "ByggnaderMark",
+        "openingAcquisitionValues": { "current": 1850000, "previous": 1850000 },
+        "purchases": { "current": 270000, "previous": null },
+        "closingAcquisitionValues": { "current": 2120000, "previous": 1850000 },
+        "openingDepreciation": { "current": 400000, "previous": 320000 },
+        "yearDepreciation": { "current": 100000, "previous": 80000 },
+        "closingDepreciation": { "current": 500000, "previous": 400000 },
+        "carryingValue": { "current": 1620000, "previous": 1450000 }
+      },
+      {
+        "noteNumber": 4,
+        "title": "Maskiner och andra tekniska anläggningar",
+        "conceptPrefix": "MaskinerAndraTekniskaAnlaggningar",
+        "openingAcquisitionValues": { "current": 520000, "previous": 190000 },
+        "purchases": { "current": 790000, "previous": 330000 },
+        "closingAcquisitionValues": { "current": 1310000, "previous": 520000 },
+        "openingDepreciation": { "current": 260000, "previous": 160000 },
+        "yearDepreciation": { "current": 190000, "previous": 100000 },
+        "closingDepreciation": { "current": 450000, "previous": 260000 },
+        "carryingValue": { "current": 860000, "previous": 260000 }
+      },
+      {
+        "noteNumber": 5,
+        "title": "Inventarier, verktyg och installationer",
+        "conceptPrefix": "InventarierVerktygInstallationer",
+        "openingAcquisitionValues": { "current": 200000, "previous": 80000 },
+        "purchases": { "current": 190000, "previous": 120000 },
+        "closingAcquisitionValues": { "current": 390000, "previous": 200000 },
+        "openingDepreciation": { "current": 100000, "previous": 70000 },
+        "yearDepreciation": { "current": 50000, "previous": 30000 },
+        "closingDepreciation": { "current": 150000, "previous": 100000 },
+        "carryingValue": { "current": 240000, "previous": 100000 }
+      },
+      {
+        "noteNumber": 6,
+        "title": "Andra långfristiga värdepappersinnehav",
+        "conceptPrefix": "AndraLangfristigaVardepappersinnehav",
+        "openingAcquisitionValues": { "current": 2250000, "previous": 2250000 },
+        "sales": { "current": 250000, "previous": null },
+        "closingAcquisitionValues": { "current": 2000000, "previous": 2250000 },
+        "carryingValue": { "current": 2000000, "previous": 2250000 }
+      }
+    ],
+    "longTermLiabilitiesNote": {
+      "noteNumber": 7,
+      "dueAfterFiveYears": { "current": 280000, "previous": 130000 }
+    },
+    "pledges": {
+      "noteNumber": 8,
+      "corporateMortgages": { "current": 2000000, "previous": 1800000 },
+      "realEstateMortgages": { "current": 800000, "previous": 800000 },
+      "totalPledges": { "current": 2800000, "previous": 2600000 }
+    },
+    "contingentLiabilities": {
+      "noteNumber": 9,
+      "totalContingent": { "current": 500000, "previous": 500000 }
+    },
+    "multiPostNote": {
+      "noteNumber": 10,
+      "description": "Aktiebolagets banklån om 2\u00a0603\u00a0000 kr redovisas under\n    följande poster i balansräkningen för 2016:",
+      "entries": [
+        {
+          "heading": "Långfristiga skulder",
+          "postName": "Övriga skulder till kreditinstitut",
+          "amount": 2193000
+        },
+        {
+          "heading": "Kortfristiga skulder",
+          "postName": "Övriga skulder",
+          "amount": 410000
+        }
+      ]
+    }
+  },
+  "signatures": {
+    "city": "Sundsvall",
+    "date": "2017-02-20",
+    "signatories": [
+      {
+        "firstName": "Karl",
+        "lastName": "Karlsson"
+      },
+      {
+        "firstName": "Karin",
+        "lastName": "Olsson",
+        "role": "Verkställande direktör"
+      }
+    ]
+  }
+}
