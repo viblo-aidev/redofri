@@ -11,9 +11,10 @@ import (
 
 	"github.com/redofri/redofri/pkg/ixbrl"
 	"github.com/redofri/redofri/pkg/model"
+	"github.com/redofri/redofri/pkg/sie"
 )
 
-const version = "0.3.0"
+const version = "0.4.0"
 
 func main() {
 	if len(os.Args) < 2 {
@@ -44,6 +45,12 @@ func main() {
 			os.Exit(1)
 		}
 
+	case "import-sie":
+		if err := runImportSIE(os.Args[2:]); err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			os.Exit(1)
+		}
+
 	case "version":
 		fmt.Printf("redofri %s\n", version)
 
@@ -61,15 +68,17 @@ func printUsage() {
 	fmt.Fprintf(os.Stderr, `redofri %s — Digital inlämning av svensk årsredovisning
 
 Usage:
-  redofri validate <input.json>       Load and validate JSON input
-  redofri generate <input.json>       Generate iXBRL to stdout
-  redofri generate -o <out> <input>   Generate iXBRL to file
-  redofri parse <input.xhtml>         Parse iXBRL to JSON (stdout)
-  redofri parse -o <out> <input>      Parse iXBRL to JSON file
-  redofri version                     Show version
-  redofri help                        Show this help
+  redofri validate <input.json>         Load and validate JSON input
+  redofri generate <input.json>         Generate iXBRL to stdout
+  redofri generate -o <out> <input>     Generate iXBRL to file
+  redofri parse <input.xhtml>           Parse iXBRL to JSON (stdout)
+  redofri parse -o <out> <input>        Parse iXBRL to JSON file
+  redofri import-sie <input.sie>        Import SIE4 to partial JSON (stdout)
+  redofri import-sie -o <out> <input>   Import SIE4 to partial JSON file
+  redofri version                       Show version
+  redofri help                          Show this help
 
-Flags (generate, parse):
+Flags (generate, parse, import-sie):
   -o, --output <file>   Write output to file (default: stdout)
 
 Input can be a file path or "-" to read from stdin.
@@ -225,4 +234,44 @@ func runValidate(path string) error {
 
 	fmt.Println("\nJSON loaded successfully.")
 	return nil
+}
+
+// runImportSIE reads a SIE4 file, parses it, and writes a partial JSON report.
+func runImportSIE(args []string) error {
+	inputPath, outputPath, err := parseIOFlags(args)
+	if err != nil {
+		return err
+	}
+	if inputPath == "" {
+		return fmt.Errorf("missing input file\nUsage: redofri import-sie [-o output.json] <input.sie>")
+	}
+
+	var r io.Reader
+	if inputPath == "-" {
+		r = os.Stdin
+	} else {
+		f, err := os.Open(inputPath)
+		if err != nil {
+			return fmt.Errorf("reading %s: %w", inputPath, err)
+		}
+		defer f.Close()
+		r = f
+	}
+
+	result, err := sie.Parse(r)
+	if err != nil {
+		return fmt.Errorf("parsing SIE: %w", err)
+	}
+
+	for _, w := range result.Warnings {
+		fmt.Fprintf(os.Stderr, "Warning: %s\n", w)
+	}
+
+	out, err := json.MarshalIndent(result.Report, "", "  ")
+	if err != nil {
+		return fmt.Errorf("encoding JSON: %w", err)
+	}
+	out = append(out, '\n')
+
+	return writeOutput(outputPath, out, "Imported")
 }
