@@ -91,7 +91,7 @@ func TestGenerateCommand(t *testing.T) {
 		if err != nil {
 			t.Fatalf("version failed: %v", err)
 		}
-		if string(out) != "redofri 0.4.0\n" {
+		if string(out) != "redofri 0.5.0\n" {
 			t.Errorf("unexpected version output: %q", string(out))
 		}
 	})

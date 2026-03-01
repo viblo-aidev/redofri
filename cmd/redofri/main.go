@@ -12,9 +12,10 @@ import (
 	"github.com/redofri/redofri/pkg/ixbrl"
 	"github.com/redofri/redofri/pkg/model"
 	"github.com/redofri/redofri/pkg/sie"
+	"github.com/redofri/redofri/pkg/validate"
 )
 
-const version = "0.4.0"
+const version = "0.5.0"
 
 func main() {
 	if len(os.Args) < 2 {
@@ -210,8 +211,8 @@ func loadReport(path string) (*model.AnnualReport, error) {
 	return &report, nil
 }
 
-// runValidate loads a JSON file, deserializes it, and reports basic stats.
-// This will be extended with real validation in Step 6.
+// runValidate loads a JSON file, runs all validation checks, and prints findings.
+// Exits with code 1 if there are errors.
 func runValidate(path string) error {
 	report, err := loadReport(path)
 	if err != nil {
@@ -221,18 +222,30 @@ func runValidate(path string) error {
 	fmt.Printf("Company:      %s (%s)\n", report.Company.Name, report.Company.OrgNr)
 	fmt.Printf("Fiscal year:  %s – %s\n", report.FiscalYear.StartDate, report.FiscalYear.EndDate)
 	fmt.Printf("Entry point:  %s\n", report.Meta.EntryPoint)
+	fmt.Println()
 
-	if report.IncomeStatement.NetResult.Current != nil {
-		fmt.Printf("Net result:   %d SEK\n", *report.IncomeStatement.NetResult.Current)
+	results := validate.Validate(report)
+
+	if len(results) == 0 {
+		fmt.Println("Validation passed: no errors or warnings.")
+		return nil
 	}
-	if report.BalanceSheet.Assets.TotalAssets.Current != nil {
-		fmt.Printf("Total assets: %d SEK\n", *report.BalanceSheet.Assets.TotalAssets.Current)
+
+	var errors, warnings int
+	for _, r := range results {
+		fmt.Println(r)
+		if r.Severity == validate.Error {
+			errors++
+		} else {
+			warnings++
+		}
 	}
 
-	fmt.Printf("Notes:        %d fixed asset notes\n", len(report.Notes.FixedAssetNotes))
-	fmt.Printf("Signatories:  %d\n", len(report.Signatures.Signatories))
+	fmt.Printf("\n%d error(s), %d warning(s)\n", errors, warnings)
 
-	fmt.Println("\nJSON loaded successfully.")
+	if errors > 0 {
+		return fmt.Errorf("validation failed with %d error(s)", errors)
+	}
 	return nil
 }
 
