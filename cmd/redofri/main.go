@@ -13,7 +13,7 @@ import (
 	"github.com/redofri/redofri/pkg/model"
 )
 
-const version = "0.2.0"
+const version = "0.3.0"
 
 func main() {
 	if len(os.Args) < 2 {
@@ -38,6 +38,12 @@ func main() {
 			os.Exit(1)
 		}
 
+	case "parse":
+		if err := runParse(os.Args[2:]); err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			os.Exit(1)
+		}
+
 	case "version":
 		fmt.Printf("redofri %s\n", version)
 
@@ -58,29 +64,86 @@ Usage:
   redofri validate <input.json>       Load and validate JSON input
   redofri generate <input.json>       Generate iXBRL to stdout
   redofri generate -o <out> <input>   Generate iXBRL to file
+  redofri parse <input.xhtml>         Parse iXBRL to JSON (stdout)
+  redofri parse -o <out> <input>      Parse iXBRL to JSON file
   redofri version                     Show version
   redofri help                        Show this help
 
-Generate flags:
-  -o, --output <file>   Write iXBRL output to file (default: stdout)
+Flags (generate, parse):
+  -o, --output <file>   Write output to file (default: stdout)
 
-Input can be a JSON file path or "-" to read from stdin.
+Input can be a file path or "-" to read from stdin.
 `, version)
 }
 
 // runGenerate parses flags, loads JSON input, and generates iXBRL output.
 func runGenerate(args []string) error {
-	var outputPath string
-	var inputPath string
+	inputPath, outputPath, err := parseIOFlags(args)
+	if err != nil {
+		return err
+	}
+	if inputPath == "" {
+		return fmt.Errorf("missing input file\nUsage: redofri generate [-o output.xhtml] <input.json>")
+	}
 
-	// Parse flags manually to avoid pulling in flag package complexities.
+	report, err := loadReport(inputPath)
+	if err != nil {
+		return err
+	}
+
+	var buf bytes.Buffer
+	if err := ixbrl.Generate(&buf, report); err != nil {
+		return fmt.Errorf("generating iXBRL: %w", err)
+	}
+
+	return writeOutput(outputPath, buf.Bytes(), "Generated")
+}
+
+// runParse reads an iXBRL file, parses it, and writes JSON output.
+func runParse(args []string) error {
+	inputPath, outputPath, err := parseIOFlags(args)
+	if err != nil {
+		return err
+	}
+	if inputPath == "" {
+		return fmt.Errorf("missing input file\nUsage: redofri parse [-o output.json] <input.xhtml>")
+	}
+
+	var r io.Reader
+	if inputPath == "-" {
+		r = os.Stdin
+	} else {
+		f, err := os.Open(inputPath)
+		if err != nil {
+			return fmt.Errorf("reading %s: %w", inputPath, err)
+		}
+		defer f.Close()
+		r = f
+	}
+
+	report, err := ixbrl.Parse(r)
+	if err != nil {
+		return fmt.Errorf("parsing iXBRL: %w", err)
+	}
+
+	out, err := json.MarshalIndent(report, "", "  ")
+	if err != nil {
+		return fmt.Errorf("encoding JSON: %w", err)
+	}
+	out = append(out, '\n')
+
+	return writeOutput(outputPath, out, "Parsed")
+}
+
+// parseIOFlags parses -o/--output and positional input path from args.
+func parseIOFlags(args []string) (inputPath, outputPath string, err error) {
 	i := 0
 	for i < len(args) {
 		switch {
 		case args[i] == "-o" || args[i] == "--output":
 			i++
 			if i >= len(args) {
-				return fmt.Errorf("-o/--output requires a file path argument")
+				return "", "", fmt.Errorf("-o/--output requires a file path argument")
 			}
 			outputPath = args[i]
 		case strings.HasPrefix(args[i], "-o="):
@@ -89,7 +152,7 @@ func runGenerate(args []string) error {
 			outputPath = args[i][9:]
 		case strings.HasPrefix(args[i], "-"):
 			if args[i] != "-" {
-				return fmt.Errorf("unknown flag: %s", args[i])
+				return "", "", fmt.Errorf("unknown flag: %s", args[i])
 			}
 			inputPath = "-"
 		default:
@@ -97,34 +160,19 @@ func runGenerate(args []string) error {
 		}
 		i++
 	}
+	return inputPath, outputPath, nil
+}
 
-	if inputPath == "" {
-		return fmt.Errorf("missing input file\nUsage: redofri generate [-o output.xhtml] <input.json>")
-	}
-
-	// Load input.
-	report, err := loadReport(inputPath)
-	if err != nil {
-		return err
-	}
-
-	// Generate iXBRL.
-	var buf bytes.Buffer
-	if err := ixbrl.Generate(&buf, report); err != nil {
-		return fmt.Errorf("generating iXBRL: %w", err)
-	}
-
-	// Write output.
+// writeOutput writes data to a file or stdout, printing a status line to stderr.
+func writeOutput(outputPath string, data []byte, verb string) error {
 	if outputPath == "" {
-		_, err = io.Copy(os.Stdout, &buf)
+		_, err := os.Stdout.Write(data)
 		return err
 	}
-
-	if err := os.WriteFile(outputPath, buf.Bytes(), 0644); err != nil {
+	if err := os.WriteFile(outputPath, data, 0644); err != nil {
 		return fmt.Errorf("writing %s: %w", outputPath, err)
 	}
-
-	fmt.Fprintf(os.Stderr, "Generated %s (%d bytes)\n", outputPath, buf.Len())
+	fmt.Fprintf(os.Stderr, "%s %s (%d bytes)\n", verb, outputPath, len(data))
 	return nil
 }
 

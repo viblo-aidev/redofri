@@ -91,8 +91,55 @@ func TestGenerateCommand(t *testing.T) {
 		if err != nil {
 			t.Fatalf("version failed: %v", err)
 		}
-		if string(out) != "redofri 0.2.0\n" {
+		if string(out) != "redofri 0.3.0\n" {
 			t.Errorf("unexpected version output: %q", string(out))
+		}
+	})
+
+	t.Run("parse to stdout", func(t *testing.T) {
+		// First generate an iXBRL file.
+		xhtmlPath := filepath.Join(tmpDir, "roundtrip.xhtml")
+		genCmd := exec.Command(bin, "generate", "-o", xhtmlPath, inputPath)
+		if out, err := genCmd.CombinedOutput(); err != nil {
+			t.Fatalf("generate for parse test: %v\n%s", err, out)
+		}
+
+		// Parse it back.
+		parseCmd := exec.Command(bin, "parse", xhtmlPath)
+		out, err := parseCmd.Output()
+		if err != nil {
+			t.Fatalf("parse failed: %v", err)
+		}
+		// Output should be JSON starting with '{'.
+		if len(out) == 0 || out[0] != '{' {
+			preview := string(out)
+			if len(preview) > 50 {
+				preview = preview[:50]
+			}
+			t.Errorf("expected JSON output, got: %q", preview)
+		}
+	})
+
+	t.Run("parse to file", func(t *testing.T) {
+		xhtmlPath := filepath.Join(tmpDir, "roundtrip2.xhtml")
+		jsonPath := filepath.Join(tmpDir, "parsed.json")
+
+		genCmd := exec.Command(bin, "generate", "-o", xhtmlPath, inputPath)
+		if out, err := genCmd.CombinedOutput(); err != nil {
+			t.Fatalf("generate: %v\n%s", err, out)
+		}
+
+		parseCmd := exec.Command(bin, "parse", "-o", jsonPath, xhtmlPath)
+		if out, err := parseCmd.CombinedOutput(); err != nil {
+			t.Fatalf("parse: %v\n%s", err, out)
+		}
+
+		info, err := os.Stat(jsonPath)
+		if err != nil {
+			t.Fatalf("output file not found: %v", err)
+		}
+		if info.Size() < 1000 {
+			t.Errorf("output too small: %d bytes", info.Size())
 		}
 	})
 }
