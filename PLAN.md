@@ -56,26 +56,42 @@ Webb-formulär (framtida) eller JSON-fil (utveckling/test).
 
 ```
 redofri/
+├── .github/
+│   └── workflows/
+│       └── ci.yml                # CI: tester + bygge av binärer
 ├── cmd/
-│   └── redofri/              # CLI entry point
-│       └── main.go
+│   └── redofri/                  # CLI entry point
+│       ├── main.go               # v0.5.0: generate, parse, validate, import-sie, version, help
+│       └── main_test.go          # CLI integration tests
 ├── pkg/
-│   ├── model/                # Go structs - det centrala kontraktet
-│   │   └── model.go          # AnnualReport, IncomeStatement, BalanceSheet, etc.
+│   ├── model/                    # Go structs - det centrala kontraktet
+│   │   ├── model.go              # AnnualReport, IncomeStatement, BalanceSheet, etc. (~594 rader)
+│   │   └── model_test.go         # 11 tester
 │   ├── ixbrl/
-│   │   ├── generate.go       # model → .xhtml (iXBRL-generering)
-│   │   ├── contexts.go       # XBRL-kontexer och enheter
-│   │   ├── tags.go           # iXBRL-taggningshjälpare (ix:nonNumeric, ix:nonFraction)
-│   │   ├── parse.go          # .xhtml → model (läsa tillbaka tidigare år)
-│   │   └── templates/        # HTML-templates (go:embed)
-│   ├── sie/                  # SIE-parser → fyller model.AnnualReport
-│   │   └── parse.go
-│   ├── taxonomy/             # Taxonomihantering - koncept, entry points
-│   │   └── taxonomy.go
-│   └── validate/             # Validerar model.AnnualReport (oavsett källa)
-│       └── validate.go
-├── testdata/                 # JSON-indata och förväntad output
-├── ref/                      # Referensmaterial
+│   │   ├── generate.go           # model → .xhtml (iXBRL-generering)
+│   │   ├── format.go             # Nummerformatering (ixt:numspacecomma etc.)
+│   │   ├── header.go             # ix:header med kontexer, enheter, schemareferenser
+│   │   ├── css.go                # Inline CSS
+│   │   ├── cover.go              # Framsida
+│   │   ├── management.go         # Förvaltningsberättelse
+│   │   ├── income.go             # Resultaträkning
+│   │   ├── balance.go            # Balansräkning
+│   │   ├── notes.go              # Noter
+│   │   ├── signatures.go         # Underskrifter
+│   │   ├── generate_test.go      # 30 tester
+│   │   ├── parse.go              # .xhtml → model (iXBRL-parser)
+│   │   ├── parse_map.go          # XBRL-koncept → Go-fält mappning
+│   │   └── parse_test.go         # Roundtrip-tester
+│   ├── sie/                      # SIE-parser → fyller model.AnnualReport
+│   │   ├── parse.go              # SIE4-parser med CP437-autodetektering, BAS-kontomappning
+│   │   └── parse_test.go         # 16 tester
+│   └── validate/                 # Validerar model.AnnualReport (oavsett källa)
+│       ├── validate.go           # Valideringsmotor (~582 rader), BV-koder 1019-3007
+│       └── validate_test.go      # 47 tester
+├── testdata/
+│   ├── exempel1.json             # Komplett testdata (326 rader)
+│   └── exempel1.sie              # Syntetisk SIE4-testfil
+├── ref/                          # Referensmaterial (taxonomi, teknisk guide, exempelfiler)
 ├── go.mod
 ├── PLAN.md
 └── LICENSE
@@ -179,43 +195,53 @@ http://xbrl.taxonomier.se/se/fr/gaap/k2-all/ab/{variant}/2024-09-12/se-k2-ab-{va
 
 ## Implementationsordning
 
-### Steg 1: Grundstomme + Datamodell
-- [ ] Go-modul, projektstruktur
-- [ ] model/ med Go structs för alla delar av årsredovisningen
-- [ ] JSON-serialisering (utveckling/test)
-- [ ] Testdata baserad på "Exempel 1 AB" från taxonomier.se
+### Steg 1: Grundstomme + Datamodell ✅
+- [x] Go-modul, projektstruktur
+- [x] model/ med Go structs för alla delar av årsredovisningen (~594 rader)
+- [x] JSON-serialisering (utveckling/test)
+- [x] Testdata baserad på "Exempel 1 AB" från taxonomier.se (testdata/exempel1.json)
+- [x] 11 enhetstester
 
-### Steg 2: iXBRL-generering (kärnan)
-- [ ] XHTML-grundstruktur med inline CSS
-- [ ] ix:header - kontexer, enheter, schemareferenser, dolda metadata
-- [ ] Framsida + fastställelseintyg
-- [ ] Förvaltningsberättelse med flerårsöversikt
-- [ ] Resultaträkning (kostnadsslagsindelad, fullständig)
-- [ ] Balansräkning (fullständig)
-- [ ] Noter
-- [ ] Underskrifter
-- [ ] Alla ~125 XBRL-koncept korrekt taggade
+### Steg 2: iXBRL-generering (kärnan) ✅
+- [x] XHTML-grundstruktur med inline CSS
+- [x] ix:header - kontexer, enheter, schemareferenser, dolda metadata
+- [x] Framsida + fastställelseintyg
+- [x] Förvaltningsberättelse med flerårsöversikt
+- [x] Resultaträkning (kostnadsslagsindelad, fullständig)
+- [x] Balansräkning (fullständig)
+- [x] Noter
+- [x] Underskrifter
+- [x] Alla ~125 XBRL-koncept korrekt taggade
+- [x] 30 tester
 
-### Steg 3: CLI
-- [ ] `redofri generate --input data.json --output arsredovisning.xhtml`
-- [ ] `redofri validate --input data.json`
-- [ ] `redofri example` (skriver exempelfil med JSON-indata)
+### Steg 3: CLI ✅
+- [x] `redofri generate <input.json>` (till stdout eller -o fil)
+- [x] `redofri validate <input.json>`
+- [x] `redofri parse <input.xhtml>` (iXBRL → JSON)
+- [x] `redofri import-sie <input.sie>` (SIE4 → JSON)
+- [x] `redofri version` / `redofri help`
+- [x] Stöd för stdin med `-`
+- [x] CLI integration tests
 
-### Steg 4: iXBRL-parser (roundtrip)
-- [ ] Parsa .xhtml tillbaka till model.AnnualReport
-- [ ] Roundtrip-test: generera → parsa → jämför
-- [ ] Stöd för att läsa in föregående års årsredovisning
+### Steg 4: iXBRL-parser (roundtrip) ✅
+- [x] Parsa .xhtml tillbaka till model.AnnualReport
+- [x] Roundtrip-test: generera → parsa → jämför
+- [x] XBRL-koncept → Go-fält mappning (parse_map.go)
 
-### Steg 5: SIE-import
-- [ ] Parsa SIE4-filer
-- [ ] Mappa BAS-konton till K2-taxonomikoncept
-- [ ] Fyll model.AnnualReport med saldon
+### Steg 5: SIE-import ✅
+- [x] Parsa SIE4-filer (med CP437-autodetektering)
+- [x] Mappa BAS-konton till K2-taxonomikoncept
+- [x] Fyll model.AnnualReport med saldon
+- [x] 16 tester
+- [x] Syntetisk SIE4-testfil (testdata/exempel1.sie)
 
-### Steg 6: Validering
-- [ ] Beräkningskontroller (summor stämmer)
-- [ ] Obligatoriska fält
-- [ ] Taxonomiregler
-- [ ] Jämför mot Bolagsverkets valideringskoder
+### Steg 6: Validering ✅
+- [x] Obligatoriska fält (BV-koder 1019-1201)
+- [x] Beräkningskontroller: resultaträkning, balansräkning, eget kapital, resultatdisposition
+- [x] Affärsregler: valutagodkännande, datumordning, räkenskapsårslängd, jämförelsetal
+- [x] Anläggningstillgångsnot: redovisat värde = anskaffningsvärde - ackumulerade avskrivningar
+- [x] 47 tester
+- [x] CLI validate-kommando uppdaterat med fullständig validering och exitkod 1 vid fel
 
 ### Steg 7: API-integration
 - [ ] TLS-klientcertifikat
@@ -230,3 +256,14 @@ http://xbrl.taxonomier.se/se/fr/gaap/k2-all/ab/{variant}/2024-09-12/se-k2-ab-{va
 - [ ] Uppladdning av föregående årsredovisning
 - [ ] Förhandsgranskning
 - [ ] Inlämningsflöde
+
+## CI/CD
+
+GitHub Actions workflow (`.github/workflows/ci.yml`) körs på varje push och PR till main:
+
+1. **Test** - `go test -v -race ./...` (alla paket, med race detector)
+2. **Build** - Cross-kompilerar binärer för:
+   - linux/amd64, linux/arm64
+   - darwin/amd64, darwin/arm64
+   - windows/amd64
+3. Binärer laddas upp som GitHub Actions artifacts
