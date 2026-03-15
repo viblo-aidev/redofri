@@ -352,7 +352,8 @@ type YearComparisonVal struct {
 func (g *generator) pageHeader(companyName, orgNr string, pageNum, totalPages int) {
 	g.linef(`<div class="ar-page-hdr">`)
 	g.in()
-	g.linef(`<span>%s<br />%s</span>    %d (%d)  `, esc(companyName), esc(orgNr), pageNum, totalPages)
+	g.linef(`<span class="ar-page-hdr-company">%s<br />%s</span>`, esc(companyName), esc(orgNr))
+	g.linef(`<span class="ar-page-hdr-page">Sida %d av %d</span>`, pageNum, totalPages)
 	g.out()
 	g.line(`</div>`)
 }

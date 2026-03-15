@@ -27,6 +27,7 @@ func (g *generator) writeNotes(r *model.AnnualReport) {
 	g.in()
 	g.pageHeader(r.Company.Name, r.Company.OrgNr, 7, totalPages)
 	g.line(`<h2>Noter</h2>`)
+	g.line(`<p class="ar-amount-note">Noterna förklarar de belopp och bedömningar som ligger bakom resultat- och balansräkningen.</p>`)
 
 	g.writeAccountingPoliciesNote(r, &notes.AccountingPolicies)
 	if notes.Employees != nil {

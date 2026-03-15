@@ -31,6 +31,22 @@ func (g *generator) writeCoverPage(r *model.AnnualReport) {
 
 	// Year heading
 	g.linef(`<h2>Årsredovisning för räkenskapsåret %s</h2>`, yearLabel)
+	g.line(`<div class="ar-cover-meta">`)
+	g.in()
+	g.write(indentStr(g.indent))
+	g.write(`<div class="ar-cover-meta-item"><span>Bolag</span><strong>`)
+	g.nonNumeric("se-cd-base:ForetagetsNamn", "period0", r.Company.Name)
+	g.write(`</strong></div>`)
+	g.write("\n")
+	g.write(indentStr(g.indent))
+	g.write(`<div class="ar-cover-meta-item"><span>Organisationsnummer</span><strong>`)
+	g.nonNumeric("se-cd-base:Organisationsnummer", "period0", r.Company.OrgNr)
+	g.write(`</strong></div>`)
+	g.write("\n")
+	g.linef(`<div class="ar-cover-meta-item"><span>Räkenskapsår</span><strong>%s - %s</strong></div>`, esc(r.FiscalYear.StartDate), esc(r.FiscalYear.EndDate))
+	g.linef(`<div class="ar-cover-meta-item"><span>Valuta</span><strong>%s</strong></div>`, esc(r.Meta.Currency))
+	g.out()
+	g.line(`</div>`)
 
 	// Intro text
 	g.write("\t\t\t\t")
@@ -43,7 +59,7 @@ func (g *generator) writeCoverPage(r *model.AnnualReport) {
 	g.writeTOC(r, totalPages)
 
 	// Standard note about amounts
-	g.line(`<p>Om inte annat särskilt anges, redovisas alla belopp i hela kronor. Uppgifter inom parentes avser föregående år.</p>`)
+	g.line(`<p class="ar-amount-note">Om inte annat särskilt anges, redovisas alla belopp i hela kronor. Uppgifter inom parentes avser föregående år.</p>`)
 
 	// Fastställelseintyg
 	g.writeCertification(r)

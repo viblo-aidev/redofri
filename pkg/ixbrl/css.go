@@ -6,6 +6,10 @@ func (g *generator) writeCSS() {
 	g.raw(`
 html {
 	font: 100%/1.4 Frutiger, Frutiger Linotype, Univers, DejaVu Sans Condensed, Liberation Sans, Nimbus Sans L, Geneva, Helvetica Neue, Helvetica, Arial, Tahoma, sans-serif; font-size-adjust: none; font-stretch: normal;
+	background: linear-gradient(180deg, rgb(242, 245, 247) 0%, rgb(233, 238, 242) 100%);
+}
+body {
+	color: rgb(32, 42, 50);
 }
 p {
 	margin: 0px 0px 1.4em;
@@ -57,13 +61,13 @@ tbody th[colspan='1'] {
 }
 @media screen {
 body {
-	margin: 0px auto; padding: 0px; max-width: 70em;
+	margin: 0px auto; padding: 2rem 1.5rem 4rem; max-width: 90em;
 }
 h1, h2, h3, h4, h5, h6 {
-	color: rgb(68, 68, 68);
+	color: rgb(36, 53, 66);
 }
 #wrapper {
-	padding: 0px 0px 0px 15em; background-color: rgb(255, 255, 255);
+	padding: 0px; background-color: transparent;
 }
 }
 @media print {
@@ -87,16 +91,19 @@ abbr[title] {
 }
 }
 .ar-page {
-	margin: 1em 0px; padding: 1em 2em 2em; border: 1px solid rgb(240, 240, 240); border-image: none; line-height: 1.2; min-height: 52em; max-width: 38em; box-shadow: 0.25em 0.25em 0.3em #999;
+	margin: 0 auto 2rem; padding: 1.35em 2.2em 2.2em; border: 1px solid rgb(214, 222, 228); border-image: none; line-height: 1.28; min-height: 52em; max-width: 44em; background: rgb(255, 255, 252); box-shadow: 0 18px 44px rgba(53, 66, 74, 0.14);
 }
 .note.ar-page {
-	min-width: 20em;
+	min-width: 24em;
 }
 .wide.ar-page {
-	min-width: 30em;
+	min-width: 36em;
 }
 .ar-page {
 	font-family: Times New Roman,Times,serif;
+}
+.ar-page > h2:first-of-type {
+	padding-bottom: 0.35em; border-bottom: 2px solid rgb(116, 136, 150); letter-spacing: 0.01em;
 }
 #main .ar-page dl, #main .ar-page p {
 	font-family: Times New Roman,Times,serif;
@@ -111,7 +118,7 @@ abbr[title] {
 	margin: 0px;
 }
 .ar-page h3 {
-	margin: 0px 0px 0.5em; font-size: 100%; font-weight: bold;
+	margin: 1.35em 0px 0.55em; font-size: 100%; font-weight: bold;
 }
 .ar-page h3[id] {
 	line-height: 1.8em;
@@ -130,6 +137,9 @@ abbr[title] {
 }
 .ar-page table tbody tr {
 	background-color: transparent;
+}
+.ar-page table tbody tr + tr td, .ar-page table tbody tr + tr th {
+	padding-top: 0.22em;
 }
 .ar-page td, .ar-page th {
 	border: 0px currentColor; border-image: none; padding-left: 0px; font-size: 1em; vertical-align: bottom;
@@ -159,7 +169,7 @@ table.col-5 td + td, table.col-5 th + th {
 	width: 8em;
 }
 .ar-financial thead th {
-	font-size: 120%; font-weight: bold;
+	font-size: 120%; font-weight: bold; padding-bottom: 0.45em; border-bottom: 1px solid rgb(120, 132, 140);
 }
 .ar-equity.ar-financial thead th {
 	font-size: 100%; font-weight: normal;
@@ -174,7 +184,7 @@ table.col-5 td + td, table.col-5 th + th {
 	padding-top: 1em;
 }
 .ar-financial tbody th.sub {
-	font-style: italic; font-weight: normal;
+	font-style: italic; font-weight: normal; color: rgb(73, 84, 92);
 }
 .ar-financial tbody th.sup {
 	font-size: 120%; font-weight: bold;
@@ -190,6 +200,9 @@ table.col-5 td + td, table.col-5 th + th {
 }
 .ar-financial tr.result td:first-child {
 	font-style: italic; font-weight: bold;
+}
+.ar-financial tbody + tbody {
+	border-top: 1px solid rgb(215, 220, 224);
 }
 .ar-financial td a {
 	color: rgb(0, 0, 0); text-decoration: none;
@@ -249,10 +262,16 @@ td .total {
 	border-bottom-color: currentColor; border-bottom-width: 3px; border-bottom-style: double;
 }
 .ar-page-hdr {
-	text-align: right; color: rgb(102, 102, 102); overflow: hidden; margin-bottom: 3em; white-space: nowrap; font-size: 75%;
+	display: flex; justify-content: space-between; align-items: flex-start; gap: 1em; color: rgb(97, 108, 117); overflow: hidden; margin-bottom: 2.2em; white-space: nowrap; font-size: 75%; letter-spacing: 0.03em; text-transform: uppercase;
 }
 .ar-page-hdr span {
-	text-align: left; float: left;
+	text-align: left; float: none;
+}
+.ar-page-hdr-company {
+	font-weight: bold;
+}
+.ar-page-hdr-page {
+	text-align: right;
 }
 .ar-toc th {
 	padding-bottom: 1em;
@@ -266,11 +285,38 @@ td .total {
 .ar-toc td span {
 	margin-right: 1em;
 }
+.ar-cover-meta {
+	display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem 1.25rem; margin: 1.2em 0 1.8em; padding: 1em 1.15em; border: 1px solid rgb(213, 220, 226); background: rgb(247, 248, 244);
+}
+.ar-cover-meta-item span {
+	display: block; margin-bottom: 0.2em; color: rgb(92, 104, 114); font-size: 0.78em; letter-spacing: 0.06em; text-transform: uppercase; font-family: Frutiger, Frutiger Linotype, Univers, DejaVu Sans Condensed, Liberation Sans, Nimbus Sans L, Geneva, Helvetica Neue, Helvetica, Arial, Tahoma, sans-serif;
+}
+.ar-cover-meta-item strong {
+	font-size: 1.02em; font-weight: bold;
+}
+.ar-amount-note {
+	padding: 0.75em 0.9em; border-left: 4px solid rgb(122, 136, 142); background: rgb(247, 247, 247); font-size: 0.95em;
+}
+.ar-toc {
+	margin-top: 1.8em;
+}
+.ar-toc thead th {
+	border-bottom: 1px solid rgb(120, 132, 140);
+}
+.ar-toc tbody tr + tr td {
+	padding-top: 0.35em;
+}
 #main #ar-certification > p {
 	font-family: Calibri,Tahoma,sans-serif;
 }
+#ar-certification {
+	margin-top: 1.8em; padding: 1.1em 1.2em; border: 1px solid rgb(190, 198, 204); background: linear-gradient(180deg, rgb(251, 251, 248) 0%, rgb(244, 244, 240) 100%);
+}
+#ar-certification strong:first-child {
+	display: inline-block; margin-bottom: 0.6em; letter-spacing: 0.04em; text-transform: uppercase;
+}
 .ar-logo {
-	margin: 5em 0px 4em; font-weight: bold;
+	margin: 2em 0px 2.5em; font-weight: bold; font-size: 1.2em; line-height: 1.5;
 }
 .ar-signature {
 	font-family: Calibri,Tahoma,sans-serif; margin-left: 0.5em;
@@ -282,7 +328,7 @@ td .total {
 	padding-left: 0.6em; font-size: smaller; border-top-color: currentColor; border-top-width: 1px; border-top-style: dotted;
 }
 .ar-overview {
-	table-layout: fixed;
+	table-layout: fixed; margin-top: 1.2em;
 }
 .ar-overview thead th {
 	font-size: 100%; font-weight: normal;
@@ -294,7 +340,7 @@ p.ar-disp {
 	margin: 1.5em 0px 0px;
 }
 table.ar-disp {
-	width: 75%; table-layout: fixed; min-width: 16em;
+	width: 80%; table-layout: fixed; min-width: 18em;
 }
 .ar-disp td + td {
 	text-align: right;
@@ -345,17 +391,20 @@ col.kr-2 {
 	margin-top: 3em;
 }
 .ar-signature-2 {
-	margin-top: 2em;
+	margin-top: 3em; padding-top: 1.5em; border-top: 1px solid rgb(180, 189, 196);
 }
 .ar-signature-2 div.name {
-	width: 40%; padding-top: 0em; vertical-align: top; display: inline-block;
+	width: 46%; margin: 1.6em 3% 0 0; padding: 0.6em 0 0; vertical-align: top; display: inline-block; border-top: 1px solid rgb(88, 98, 106);
 }
 @media print {
 .ar-page {
-	margin: 0px; border: 0px currentColor; border-image: none; font-size: 11pt; page-break-after: always; min-height: 0px; max-width: none; page-break-inside: avoid; box-shadow: none;
+	margin: 0px; border: 0px currentColor; border-image: none; font-size: 11pt; page-break-after: always; min-height: 0px; max-width: none; page-break-inside: avoid; box-shadow: none; background: none;
 }
 .ar-page:last-of-type {
 	page-break-after: avoid;
+}
+.ar-cover-meta, #ar-certification, .ar-amount-note {
+	background: none;
 }
 }
 `)

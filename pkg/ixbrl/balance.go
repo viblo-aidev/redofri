@@ -16,6 +16,8 @@ func (g *generator) writeBalanceSheetAssets(r *model.AnnualReport) {
 	g.line(`<div class="ar-page wide" id="ar3-page-5">`)
 	g.in()
 	g.pageHeader(r.Company.Name, r.Company.OrgNr, 5, totalPages)
+	g.line(`<h2>Balansräkning</h2>`)
+	g.line(`<p class="ar-amount-note">Balansräkningen visar bolagets tillgångar, eget kapital och skulder på balansdagen, jämfört med föregående år.</p>`)
 
 	g.line(`<table class="ar-balance-sheet ar-financial col-4">`)
 	g.in()
@@ -235,6 +237,7 @@ func (g *generator) writeBalanceSheetEquityLiabilities(r *model.AnnualReport) {
 	g.line(`<div class="ar-page wide" id="ar3-page-6">`)
 	g.in()
 	g.pageHeader(r.Company.Name, r.Company.OrgNr, 6, totalPages)
+	g.line(`<h2>Balansräkning</h2>`)
 
 	g.line(`<table class="ar-balance-sheet ar-financial col-4">`)
 	g.in()

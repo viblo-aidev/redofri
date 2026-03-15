@@ -14,6 +14,8 @@ func (g *generator) writeIncomeStatement(r *model.AnnualReport) {
 	g.line(`<div class="ar-page wide" id="ar3-page-4">`)
 	g.in()
 	g.pageHeader(r.Company.Name, r.Company.OrgNr, 4, totalPages)
+	g.line(`<h2>Resultaträkning</h2>`)
+	g.line(`<p class="ar-amount-note">Rapporten visar bolagets intäkter, kostnader och resultat för aktuellt och föregående räkenskapsår.</p>`)
 
 	g.line(`<table class="ar-profit-loss ar-financial col-4">`)
 	g.in()
