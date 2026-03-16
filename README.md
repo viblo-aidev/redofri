@@ -31,6 +31,7 @@ go build -o redofri ./cmd/redofri
 ## Usage
 
 ```
+redofri demo-generate                  # Generate a demo iXBRL file
 redofri generate <input.json>           # Generate iXBRL to stdout
 redofri generate -o out.xhtml input.json  # Generate iXBRL to file
 redofri validate <input.json>           # Validate a report
@@ -41,6 +42,12 @@ redofri help                            # Show help
 ```
 
 All commands accept `-o <file>` to write output to a file instead of stdout. Input can be `-` to read from stdin.
+
+If you want to try the tool immediately without preparing any input data first:
+
+```
+redofri demo-generate -o demo.xhtml
+```
 
 ### Typical workflow
 
