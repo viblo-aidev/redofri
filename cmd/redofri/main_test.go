@@ -85,6 +85,71 @@ func TestGenerateCommand(t *testing.T) {
 		}
 	})
 
+	t.Run("demo-generate command writes default file", func(t *testing.T) {
+		workDir := t.TempDir()
+		cmd := exec.Command(bin, "demo-generate")
+		cmd.Dir = workDir
+
+		out, err := cmd.CombinedOutput()
+		if err != nil {
+			t.Fatalf("demo-generate failed: %v\n%s", err, out)
+		}
+
+		if len(out) == 0 || string(out) == "" {
+			t.Fatalf("expected status output from demo-generate")
+		}
+
+		data, err := os.ReadFile(filepath.Join(workDir, defaultDemoOutput))
+		if err != nil {
+			t.Fatalf("default demo xhtml file not found: %v", err)
+		}
+		if len(data) < 50000 {
+			t.Fatalf("demo xhtml output too small: %d bytes", len(data))
+		}
+		if string(data[:5]) != "<?xml" {
+			t.Fatalf("demo xhtml output missing XML declaration: %q", string(data[:20]))
+		}
+	})
+
+	t.Run("demo-generate command writes custom file", func(t *testing.T) {
+		outPath := filepath.Join(t.TempDir(), "demo.xhtml")
+		cmd := exec.Command(bin, "demo-generate", "-o", outPath)
+
+		out, err := cmd.CombinedOutput()
+		if err != nil {
+			t.Fatalf("demo-generate failed: %v\n%s", err, out)
+		}
+
+		data, err := os.ReadFile(outPath)
+		if err != nil {
+			t.Fatalf("custom demo xhtml file not found: %v", err)
+		}
+		if len(data) < 50000 {
+			t.Fatalf("demo xhtml output too small: %d bytes", len(data))
+		}
+	})
+
+	t.Run("demo-generate output can be parsed", func(t *testing.T) {
+		xhtmlPath := filepath.Join(t.TempDir(), "demo.xhtml")
+		genCmd := exec.Command(bin, "demo-generate", "-o", xhtmlPath)
+		if out, err := genCmd.CombinedOutput(); err != nil {
+			t.Fatalf("demo-generate: %v\n%s", err, out)
+		}
+
+		parseCmd := exec.Command(bin, "parse", xhtmlPath)
+		out, err := parseCmd.Output()
+		if err != nil {
+			t.Fatalf("parse failed: %v", err)
+		}
+		if len(out) == 0 || out[0] != '{' {
+			preview := string(out)
+			if len(preview) > 50 {
+				preview = preview[:50]
+			}
+			t.Fatalf("expected JSON output, got: %q", preview)
+		}
+	})
+
 	t.Run("version command", func(t *testing.T) {
 		cmd := exec.Command(bin, "version")
 		out, err := cmd.Output()

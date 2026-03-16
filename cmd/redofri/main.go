@@ -3,6 +3,7 @@ package main
 
 import (
 	"bytes"
+	_ "embed"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -16,6 +17,11 @@ import (
 )
 
 const version = "0.5.0"
+
+const defaultDemoOutput = "redofri-demo.xhtml"
+
+//go:embed demo.json
+var demoReportData []byte
 
 func main() {
 	if len(os.Args) < 2 {
@@ -52,6 +58,12 @@ func main() {
 			os.Exit(1)
 		}
 
+	case "demo-generate":
+		if err := runDemoGenerate(os.Args[2:]); err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			os.Exit(1)
+		}
+
 	case "version":
 		fmt.Printf("redofri %s\n", version)
 
@@ -76,6 +88,8 @@ Usage:
   redofri parse -o <out> <input>        Parse iXBRL to JSON file
   redofri import-sie <input.sie>        Import SIE4 to partial JSON (stdout)
   redofri import-sie -o <out> <input>   Import SIE4 to partial JSON file
+  redofri demo-generate                Generate demo iXBRL to redofri-demo.xhtml
+  redofri demo-generate -o <out>       Generate demo iXBRL to file
   redofri version                       Show version
   redofri help                          Show this help
 
@@ -287,4 +301,29 @@ func runImportSIE(args []string) error {
 	out = append(out, '\n')
 
 	return writeOutput(outputPath, out, "Imported")
+}
+
+func runDemoGenerate(args []string) error {
+	inputPath, outputPath, err := parseIOFlags(args)
+	if err != nil {
+		return err
+	}
+	if inputPath != "" {
+		return fmt.Errorf("unexpected argument: %s\nUsage: redofri demo-generate [-o output.xhtml]", inputPath)
+	}
+	if outputPath == "" {
+		outputPath = defaultDemoOutput
+	}
+
+	var report model.AnnualReport
+	if err := json.Unmarshal(demoReportData, &report); err != nil {
+		return fmt.Errorf("parsing embedded demo data: %w", err)
+	}
+
+	var buf bytes.Buffer
+	if err := ixbrl.Generate(&buf, &report); err != nil {
+		return fmt.Errorf("generating demo iXBRL: %w", err)
+	}
+
+	return writeOutput(outputPath, buf.Bytes(), "Generated")
 }
