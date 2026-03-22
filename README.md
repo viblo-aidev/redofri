@@ -1,5 +1,7 @@
 # Redofri
 
+![Redofri logo](design/logos/Redofri%20logo.svg)
+
 Command-line tool for generating Swedish annual reports (årsredovisning) in iXBRL format, ready for digital submission to Bolagsverket.
 
 First version targets **K2 for aktiebolag (AB) with fastställelseintyg**.
