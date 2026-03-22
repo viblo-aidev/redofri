@@ -17,10 +17,10 @@
     "softwareVersion": "0.5.0"
   },
   "certification": {
-    "confirmationText": "Jag intygar att resultatrakningen och balansrakningen har faststallts pa arsstamma",
+    "confirmationText": "Jag intygar att resultaträkningen och balansräkningen har fastställts på årsstämma",
     "meetingDate": "2017-03-21",
-    "dispositionDecision": "Arsstamman beslot att godkanna styrelsens forslag till vinstdisposition.",
-    "originalContentCertification": "Jag intygar att innehallet i dessa elektroniska handlingar overensstammer med originalen och att originalen undertecknats av samtliga personer som enligt lag ska underteckna dessa.",
+    "dispositionDecision": "Årsstämman beslöt att godkänna styrelsens förslag till vinstdisposition.",
+    "originalContentCertification": "Jag intygar att innehållet i dessa elektroniska handlingar överensstämmer med originalen och att originalen undertecknats av samtliga personer som enligt lag ska underteckna dessa.",
     "electronicSignatureLabel": "Elektroniskt underskriven av",
     "signatory": {
       "firstName": "Karl",
@@ -30,9 +30,9 @@
     "signingDate": "2017-03-21"
   },
   "managementReport": {
-    "introText": "Styrelsen och verkstallande direktoren avger foljande arsredovisning",
-    "businessDescription": "<p>Bolaget tillverkar och saljer produkter inom skogsnaringen. De viktigaste produkterna ar arbetsverktyg inom skogsbruket.</p><p>Bolaget har sitt sate i Sundsvall, Vasternorrlands lan, dar bolaget aven har sin butik.</p>",
-    "significantEvents": "Under aret har planering paborjats for utbyggnad av bolagets lokaler. Planeringen innefattar bland annat projektering och finansiering. Bolaget har ocksa undersokt mojligheten att starta e-handel.",
+    "introText": "Styrelsen och verkställande direktören avger följande årsredovisning",
+    "businessDescription": "<p>Bolaget tillverkar och säljer produkter inom skogsnäringen. De viktigaste produkterna är arbetsverktyg inom skogsbruket.</p><p>Bolaget har sitt säte i Sundsvall, Västernorrlands län, där bolaget även har sin butik.</p>",
+    "significantEvents": "Under året har planering påbörjats för utbyggnad av bolagets lokaler. Planeringen innefattar bland annat projektering och finansiering. Bolaget har också undersökt möjligheten att starta e-handel.",
     "multiYearOverview": {
       "years": [
         {
@@ -60,7 +60,7 @@
           "solidity": "100"
         }
       ],
-      "comment": "Bolaget bildades under 2013, men forsaljningen inleddes hosten 2014."
+      "comment": "Bolaget bildades under 2013, men försäljningen inleddes hösten 2014."
     },
     "equityChanges": {
       "openingShareCapital": 100000,
@@ -86,7 +86,7 @@
       "carriedForward": 2000000,
       "totalDisposition": 2285000
     },
-    "boardDividendStatement": "<p>Den foreslagna utdelningen reducerar bolagets soliditet till 31 procent. Soliditeten ar mot bakgrund av att bolagets verksamhet fortsatt bedrivs med lonsamhet betryggande. Likviditeten i bolaget bedoms kunna uppratthallas pa en likaledes betryggande niva.</p><p>Styrelsens uppfattning ar att den foreslagna utdelningen ej hindrar bolaget fran att fullgora sina forpliktelser pa kort och lang sikt, ej heller att fullgora erforderliga investeringar. Den foreslagna utdelningen kan darmed forsvaras med hansyn till vad som anfors i ABL 17 kap. 3 2 st. (forsiktighetsregeln).</p>"
+    "boardDividendStatement": "<p>Den föreslagna utdelningen reducerar bolagets soliditet till 31 procent. Soliditeten är mot bakgrund av att bolagets verksamhet fortsatt bedrivs med lönsamhet betryggande. Likviditeten i bolaget bedöms kunna upprätthållas på en likaledes betryggande nivå.</p><p>Styrelsens uppfattning är att den föreslagna utdelningen ej hindrar bolaget från att fullgöra sina förpliktelser på kort och lång sikt, ej heller att fullgöra erforderliga investeringar. Den föreslagna utdelningen kan därmed försvaras med hänsyn till vad som anförs i ABL 17 kap. 3 2 st. (försiktighetsregeln).</p>"
   },
   "incomeStatement": {
     "revenue": {
@@ -205,10 +205,10 @@
   "notes": {
     "accountingPolicies": {
       "noteNumber": 1,
-      "description": "Arsredovisningen ar upprattad i enlighet med arsredovisningslagen och BFNAR 2016:10 Arsredovisning i mindre foretag.",
+      "description": "Årsredovisningen är upprättad i enlighet med årsredovisningslagen och BFNAR 2016:10 Årsredovisning i mindre företag.",
       "depreciations": [
         {
-          "category": "Maskiner och andra tekniska anlaggningar",
+          "category": "Maskiner och andra tekniska anläggningar",
           "concept": "se-gen-base:AvskrivningarMateriellaAnlaggningstillgangarMaskinerAndraTekniskaAnlaggningarAr",
           "years": 5
         },
@@ -223,8 +223,8 @@
           "years": 25
         }
       ],
-      "depreciationComment": "Vid faststallande av det avskrivningsbara beloppet for dessa har hansyn tagits till beraknat restvarde.",
-      "manufacturedGoodsPolicy": "Foretaget raknar in indirekta tillverkningskostnader i anskaffningsvardet for egentillverkade varor."
+      "depreciationComment": "Vid fastställande av det avskrivningsbara beloppet för dessa har hänsyn tagits till beräknat restvärde.",
+      "manufacturedGoodsPolicy": "Företaget räknar in indirekta tillverkningskostnader i anskaffningsvärdet för egentillverkade varor."
     },
     "employees": {
       "noteNumber": 2,
@@ -245,7 +245,7 @@
       },
       {
         "noteNumber": 4,
-        "title": "Maskiner och andra tekniska anlaggningar",
+        "title": "Maskiner och andra tekniska anläggningar",
         "conceptPrefix": "MaskinerAndraTekniskaAnlaggningar",
         "openingAcquisitionValues": { "current": 520000, "previous": 190000 },
         "purchases": { "current": 790000, "previous": 330000 },
@@ -269,7 +269,7 @@
       },
       {
         "noteNumber": 6,
-        "title": "Andra langfristiga vardepappersinnehav",
+        "title": "Andra långfristiga värdepappersinnehav",
         "conceptPrefix": "AndraLangfristigaVardepappersinnehav",
         "openingAcquisitionValues": { "current": 2250000, "previous": 2250000 },
         "sales": { "current": 250000, "previous": null },
@@ -293,16 +293,16 @@
     },
     "multiPostNote": {
       "noteNumber": 10,
-      "description": "Aktiebolagets banklan om 2 603 000 kr redovisas under foljande poster i balansrakningen for 2016:",
+      "description": "Aktiebolagets banklån om 2 603 000 kr redovisas under följande poster i balansräkningen för 2016:",
       "entries": [
         {
-          "heading": "Langfristiga skulder",
-          "postName": "Ovriga skulder till kreditinstitut",
+          "heading": "Långfristiga skulder",
+          "postName": "Övriga skulder till kreditinstitut",
           "amount": 2193000
         },
         {
           "heading": "Kortfristiga skulder",
-          "postName": "Ovriga skulder",
+          "postName": "Övriga skulder",
           "amount": 410000
         }
       ]
@@ -319,7 +319,7 @@
       {
         "firstName": "Karin",
         "lastName": "Olsson",
-        "role": "Verkstallande direktor"
+        "role": "Verkställande direktör"
       }
     ]
   }
