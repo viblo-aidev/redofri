@@ -46,6 +46,18 @@ func main() {
 			os.Exit(1)
 		}
 
+	case "check":
+		if err := runCheck(os.Args[2:]); err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			os.Exit(1)
+		}
+
+	case "submit":
+		if err := runSubmit(os.Args[2:]); err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			os.Exit(1)
+		}
+
 	case "parse":
 		if err := runParse(os.Args[2:]); err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
@@ -81,22 +93,35 @@ func printUsage() {
 	fmt.Fprintf(os.Stderr, `redofri %s — Digital inlämning av svensk årsredovisning
 
 Usage:
-  redofri validate <input.json>         Load and validate JSON input
-  redofri generate <input.json>         Generate iXBRL to stdout
-  redofri generate -o <out> <input>     Generate iXBRL to file
-  redofri parse <input.xhtml>           Parse iXBRL to JSON (stdout)
-  redofri parse -o <out> <input>        Parse iXBRL to JSON file
-  redofri import-sie <input.sie>        Import SIE4 to partial JSON (stdout)
-  redofri import-sie -o <out> <input>   Import SIE4 to partial JSON file
+	redofri validate <input.json>         Load and validate JSON input
+	redofri generate <input.json>         Generate iXBRL to stdout
+	redofri generate -o <out> <input>     Generate iXBRL to file
+	redofri check <input.json>            Validate, generate, and remote-check a submission
+	redofri submit <input.json>           Validate, generate, check, and submit a report
+	redofri parse <input.xhtml>           Parse iXBRL to JSON (stdout)
+	redofri parse -o <out> <input>        Parse iXBRL to JSON file
+	redofri import-sie <input.sie>        Import SIE4 to partial JSON (stdout)
+	redofri import-sie -o <out> <input>   Import SIE4 to partial JSON file
   redofri demo-generate                Generate demo iXBRL to redofri-demo.xhtml
   redofri demo-generate -o <out>       Generate demo iXBRL to file
   redofri version                       Show version
   redofri help                          Show this help
 
-Flags (generate, parse, import-sie):
-  -o, --output <file>   Write output to file (default: stdout)
+	Flags (generate, parse, import-sie):
+	  -o, --output <file>   Write output to file (default: stdout)
 
-Input can be a file path or "-" to read from stdin.
+	Submission flags (check, submit):
+	  --base-url <url>      Submission API base URL
+	  --api-key <key>       Submission API bearer token
+	  --skip-check          Submit without remote check (submit only)
+	  --sender-pnr <pnr>    Sender personal number for skapa-inlamningtoken
+	  --signer-pnr <pnr>    Signer personal number for inlamning
+	  --email <addr>        Add recipient to epostadresser
+	  --receipt-email <a>   Add recipient to kvittensepostadresser
+	  --notify-email <a>    Add recipient to notifieringEpostadresser
+	  --document-type <t>   Handling type (default: arsredovisning_komplett)
+
+	Input can be a file path or "-" to read from stdin.
 `, version)
 }
 

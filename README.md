@@ -39,6 +39,8 @@ redofri generate -o out.xhtml input.json  # Generate iXBRL to file
 redofri validate <input.json>           # Validate a report
 redofri parse <input.xhtml>             # Parse iXBRL back to JSON
 redofri import-sie <input.sie>          # Import SIE4 to partial JSON
+redofri check <input.json>              # Validate, generate, and remote-check a submission
+redofri submit <input.json>             # Validate, generate, check, and submit a report
 redofri version                         # Show version
 redofri help                            # Show help
 ```
@@ -65,7 +67,45 @@ redofri validate report.json
 
 # 4. Generate the iXBRL file
 redofri generate -o arsredovisning.xhtml report.json
+
+# 5. Check the submission against a remote API
+redofri check report.json
+
+# 6. Submit the report
+redofri submit report.json
 ```
+
+### Local mock submission API
+
+You can run a local Bolagsverket-like mock API for end-to-end testing of the new submission flow:
+
+```
+go run ./cmd/mock-bolagsverket
+```
+
+Then point the CLI at it:
+
+```
+REDOFRI_SUBMISSION_BASE_URL=http://127.0.0.1:8080 redofri check --sender-pnr 190001010106 report.json
+REDOFRI_SUBMISSION_BASE_URL=http://127.0.0.1:8080 redofri submit --sender-pnr 190001010106 --signer-pnr 198301019876 --email jag@foretag.com report.json
+```
+
+Optional bearer auth for the mock server:
+
+```
+MOCK_BOLAGSVERKET_API_KEY=secret go run ./cmd/mock-bolagsverket
+REDOFRI_SUBMISSION_BASE_URL=http://127.0.0.1:8080 REDOFRI_SUBMISSION_API_KEY=secret redofri submit --sender-pnr 190001010106 --signer-pnr 198301019876 report.json
+```
+
+The mock now follows the documented Bolagsverket endpoint pattern more closely:
+
+- `POST /hamta-arsredovisningsinformation/v1.1/skapa-inlamningtoken`
+- `POST /hamta-arsredovisningsinformation/v1.1/skapa-kontrollsumma/{token}`
+- `POST /lamna-in-arsredovisning/v2.1/skapa-inlamningtoken/` with `pnr` and `orgnr`
+- `POST /lamna-in-arsredovisning/v2.1/kontrollera/{token}` with `handling.fil` and `handling.typ`
+- `POST /lamna-in-arsredovisning/v2.1/inlamning/{token}` with `undertecknare`, email lists, and `handling`
+
+The CLI now asks the checksum API first and reuses the returned `kontrollsumma` and `algoritm` during check/submit reporting.
 
 ## Data model
 

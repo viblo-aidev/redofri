@@ -1,9 +1,14 @@
 package main
 
 import (
+	"encoding/json"
+	"io"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -205,6 +210,82 @@ func TestGenerateCommand(t *testing.T) {
 		}
 		if info.Size() < 1000 {
 			t.Errorf("output too small: %d bytes", info.Size())
+		}
+	})
+
+	t.Run("check command", func(t *testing.T) {
+		var paths []string
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			paths = append(paths, r.URL.Path)
+			switch r.URL.Path {
+			case "/hamta-arsredovisningsinformation/v1.1/skapa-inlamningtoken":
+				_ = json.NewEncoder(w).Encode(map[string]any{"token": "chk-123"})
+			case "/hamta-arsredovisningsinformation/v1.1/skapa-kontrollsumma/chk-123":
+				_ = json.NewEncoder(w).Encode(map[string]any{"kontrollsumma": "sum-123", "algoritm": "SHA-256"})
+			case "/lamna-in-arsredovisning/v2.1/skapa-inlamningtoken/":
+				_ = json.NewEncoder(w).Encode(map[string]any{
+					"token":            "tok-123",
+					"avtalstextAndrad": "2026-03-22",
+				})
+			case "/lamna-in-arsredovisning/v2.1/kontrollera/tok-123":
+				_ = json.NewEncoder(w).Encode(map[string]any{"orgnr": "556000-1111"})
+			default:
+				http.NotFound(w, r)
+			}
+		}))
+		defer server.Close()
+
+		cmd := exec.Command(bin, "check", "--sender-pnr", "190001010106", inputPath)
+		cmd.Env = append(os.Environ(), envSubmissionBaseURL+"="+server.URL)
+
+		out, err := cmd.CombinedOutput()
+		if err != nil {
+			t.Fatalf("check failed: %v\n%s", err, out)
+		}
+		if got, want := strings.Join(paths, ","), "/hamta-arsredovisningsinformation/v1.1/skapa-inlamningtoken,/hamta-arsredovisningsinformation/v1.1/skapa-kontrollsumma/chk-123,/lamna-in-arsredovisning/v2.1/skapa-inlamningtoken/,/lamna-in-arsredovisning/v2.1/kontrollera/tok-123"; got != want {
+			t.Fatalf("paths = %q, want %q", got, want)
+		}
+		if !strings.Contains(string(out), "Remote check passed") {
+			t.Fatalf("expected success output, got:\n%s", out)
+		}
+	})
+
+	t.Run("submit command", func(t *testing.T) {
+		var paths []string
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			paths = append(paths, r.URL.Path)
+			switch r.URL.Path {
+			case "/hamta-arsredovisningsinformation/v1.1/skapa-inlamningtoken":
+				_ = json.NewEncoder(w).Encode(map[string]any{"token": "chk-123"})
+			case "/hamta-arsredovisningsinformation/v1.1/skapa-kontrollsumma/chk-123":
+				_ = json.NewEncoder(w).Encode(map[string]any{"kontrollsumma": "sum-123", "algoritm": "SHA-256"})
+			case "/lamna-in-arsredovisning/v2.1/skapa-inlamningtoken/":
+				_ = json.NewEncoder(w).Encode(map[string]any{
+					"token":            "tok-123",
+					"avtalstextAndrad": "2026-03-22",
+				})
+			case "/lamna-in-arsredovisning/v2.1/kontrollera/tok-123":
+				_ = json.NewEncoder(w).Encode(map[string]any{"orgnr": "556000-1111"})
+			case "/lamna-in-arsredovisning/v2.1/inlamning/tok-123":
+				_, _ = io.WriteString(w, `{"orgnr":"556000-1111","avsandare":"190001010106","undertecknare":"190001010106","handlingsinfo":{"typ":"arsredovisning_komplett","dokumentlangd":123,"idnummer":"49679","sha256checksumma":"sum-123"},"url":"https://example.test/submission/49679"}`)
+			default:
+				http.NotFound(w, r)
+			}
+		}))
+		defer server.Close()
+
+		cmd := exec.Command(bin, "submit", "--sender-pnr", "190001010106", "--signer-pnr", "198301019876", inputPath)
+		cmd.Env = append(os.Environ(), envSubmissionBaseURL+"="+server.URL)
+
+		out, err := cmd.CombinedOutput()
+		if err != nil {
+			t.Fatalf("submit failed: %v\n%s", err, out)
+		}
+		if got, want := strings.Join(paths, ","), "/hamta-arsredovisningsinformation/v1.1/skapa-inlamningtoken,/hamta-arsredovisningsinformation/v1.1/skapa-kontrollsumma/chk-123,/lamna-in-arsredovisning/v2.1/skapa-inlamningtoken/,/lamna-in-arsredovisning/v2.1/kontrollera/tok-123,/lamna-in-arsredovisning/v2.1/inlamning/tok-123"; got != want {
+			t.Fatalf("paths = %q, want %q", got, want)
+		}
+		if !strings.Contains(string(out), "Submission accepted: id=49679 url=https://example.test/submission/49679") {
+			t.Fatalf("expected submit output, got:\n%s", out)
 		}
 	})
 }

@@ -6,6 +6,7 @@
 package ixbrl
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"strings"
@@ -25,6 +26,15 @@ func Generate(w io.Writer, r *model.AnnualReport) error {
 		indent: 0,
 	}
 	return g.generate()
+}
+
+// GenerateBytes returns a complete iXBRL document as bytes.
+func GenerateBytes(r *model.AnnualReport) ([]byte, error) {
+	var buf bytes.Buffer
+	if err := Generate(&buf, r); err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
 }
 
 type generator struct {
