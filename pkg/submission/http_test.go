@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"io"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -125,5 +126,42 @@ func TestHTTPClientStatusError(t *testing.T) {
 	}
 	if !strings.Contains(err.Error(), "upstream failed") {
 		t.Fatalf("error = %q, want upstream body", err)
+	}
+}
+
+func TestHTTPClientWithTLSConfig(t *testing.T) {
+	dir := t.TempDir()
+	caCertPEM, _, caCert, caKey := generateCA(t)
+	serverCertPEM, serverKeyPEM := generateLeaf(t, caCert, caKey, false)
+	clientCertPEM, clientKeyPEM := generateLeaf(t, caCert, caKey, true)
+
+	caPath := writeBytes(t, dir, "ca.pem", caCertPEM)
+	serverCertPath := writeBytes(t, dir, "server.pem", serverCertPEM)
+	serverKeyPath := writeBytes(t, dir, "server.key", serverKeyPEM)
+	clientCertPath := writeBytes(t, dir, "client.pem", clientCertPEM)
+	clientKeyPath := writeBytes(t, dir, "client.key", clientKeyPEM)
+
+	httpServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_ = json.NewEncoder(w).Encode(CreateTokenResponse{Token: "tok-123"})
+	}))
+	t.Cleanup(httpServer.Close)
+	serverTLS, err := (ServerTLSConfig{CertFile: serverCertPath, KeyFile: serverKeyPath, CAFile: caPath, RequireClientCert: true}).TLS()
+	if err != nil {
+		t.Fatalf("server TLS: %v", err)
+	}
+	httpServer.TLS = serverTLS
+	httpServer.StartTLS()
+
+	client, err := NewHTTPClientWithTLS(httpServer.URL, &http.Client{Transport: &http.Transport{DialContext: (&net.Dialer{}).DialContext}}, "", ClientTLSConfig{
+		CertFile: clientCertPath,
+		KeyFile:  clientKeyPath,
+		CAFile:   caPath,
+	})
+	if err != nil {
+		t.Fatalf("NewHTTPClientWithTLS: %v", err)
+	}
+
+	if _, err := client.CreateToken(context.Background(), CreateTokenRequest{SenderPersonalNumber: "190001010106", OrgNumber: "556000-1111"}); err != nil {
+		t.Fatalf("CreateToken with mTLS: %v", err)
 	}
 }

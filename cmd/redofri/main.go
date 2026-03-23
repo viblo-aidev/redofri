@@ -114,6 +114,9 @@ Usage:
 	  --base-url <url>      Submission API base URL
 	  --api-key <key>       Submission API bearer token
 	  --skip-check          Submit without remote check (submit only)
+	  REDOFRI_SUBMISSION_CLIENT_CERT_FILE  Client certificate PEM for mTLS
+	  REDOFRI_SUBMISSION_CLIENT_KEY_FILE   Client private key PEM for mTLS
+	  REDOFRI_SUBMISSION_CA_FILE           CA PEM for server trust / mTLS
 	  --sender-pnr <pnr>    Sender personal number for skapa-inlamningtoken
 	  --signer-pnr <pnr>    Signer personal number for inlamning
 	  --email <addr>        Add recipient to epostadresser

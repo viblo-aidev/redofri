@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"strings"
 	"time"
@@ -23,12 +24,41 @@ const submissionBasePath = "/lamna-in-arsredovisning/v2.1"
 
 // NewHTTPClient creates a JSON submission client.
 func NewHTTPClient(baseURL string, httpClient *http.Client, apiKey string) (*HTTPClient, error) {
+	return NewHTTPClientWithTLS(baseURL, httpClient, apiKey, ClientTLSConfig{})
+}
+
+// NewHTTPClientWithTLS creates a JSON submission client with optional mutual TLS.
+func NewHTTPClientWithTLS(baseURL string, httpClient *http.Client, apiKey string, tlsConfig ClientTLSConfig) (*HTTPClient, error) {
 	baseURL = strings.TrimRight(baseURL, "/")
 	if baseURL == "" {
 		return nil, fmt.Errorf("base URL is required")
 	}
+	clientTLS, err := tlsConfig.TLS()
+	if err != nil {
+		return nil, err
+	}
 	if httpClient == nil {
-		httpClient = &http.Client{Timeout: 30 * time.Second}
+		transport := http.DefaultTransport.(*http.Transport).Clone()
+		transport.Proxy = http.ProxyFromEnvironment
+		transport.DialContext = (&net.Dialer{Timeout: 30 * time.Second, KeepAlive: 30 * time.Second}).DialContext
+		transport.ForceAttemptHTTP2 = true
+		transport.MaxIdleConns = 100
+		transport.IdleConnTimeout = 90 * time.Second
+		transport.TLSHandshakeTimeout = 10 * time.Second
+		transport.ExpectContinueTimeout = 1 * time.Second
+		if clientTLS != nil {
+			transport.TLSClientConfig = clientTLS
+		}
+		httpClient = &http.Client{Timeout: 30 * time.Second, Transport: transport}
+	} else if clientTLS != nil {
+		transport, ok := httpClient.Transport.(*http.Transport)
+		if !ok || transport == nil {
+			transport = http.DefaultTransport.(*http.Transport).Clone()
+		} else {
+			transport = transport.Clone()
+		}
+		transport.TLSClientConfig = clientTLS
+		httpClient.Transport = transport
 	}
 	return &HTTPClient{baseURL: baseURL, client: httpClient, apiKey: apiKey}, nil
 }

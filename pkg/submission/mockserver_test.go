@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 )
 
@@ -97,6 +98,49 @@ func TestMockServerUnauthorized(t *testing.T) {
 	h.ServeHTTP(rec, req)
 	if rec.Code != http.StatusUnauthorized {
 		t.Fatalf("status = %d, want %d", rec.Code, http.StatusUnauthorized)
+	}
+}
+
+func TestMockServerClientCertificateOrgNumberMatch(t *testing.T) {
+	dir := t.TempDir()
+	caCertPEM, _, caCert, caKey := generateCA(t)
+	serverCertPEM, serverKeyPEM := generateLeaf(t, caCert, caKey, false)
+	clientCertPEM, clientKeyPEM := generateLeaf(t, caCert, caKey, true)
+
+	caPath := writeBytes(t, dir, "ca.pem", caCertPEM)
+	serverCertPath := writeBytes(t, dir, "server.pem", serverCertPEM)
+	serverKeyPath := writeBytes(t, dir, "server.key", serverKeyPEM)
+	clientCertPath := writeBytes(t, dir, "client.pem", clientCertPEM)
+	clientKeyPath := writeBytes(t, dir, "client.key", clientKeyPEM)
+
+	httpServer := httptest.NewUnstartedServer(NewMockHandler(""))
+	t.Cleanup(httpServer.Close)
+	serverTLS, err := (ServerTLSConfig{CertFile: serverCertPath, KeyFile: serverKeyPath, CAFile: caPath, RequireClientCert: true}).TLS()
+	if err != nil {
+		t.Fatalf("server TLS: %v", err)
+	}
+	httpServer.TLS = serverTLS
+	httpServer.StartTLS()
+
+	client, err := NewHTTPClientWithTLS(httpServer.URL, httpServer.Client(), "", ClientTLSConfig{
+		CertFile: clientCertPath,
+		KeyFile:  clientKeyPath,
+		CAFile:   caPath,
+	})
+	if err != nil {
+		t.Fatalf("NewHTTPClientWithTLS: %v", err)
+	}
+
+	if _, err := client.CreateToken(t.Context(), CreateTokenRequest{SenderPersonalNumber: "190001010106", OrgNumber: "556000-1111"}); err != nil {
+		t.Fatalf("CreateToken: %v", err)
+	}
+
+	_, err = client.CreateToken(t.Context(), CreateTokenRequest{SenderPersonalNumber: "190001010106", OrgNumber: "556000-2222"})
+	if err == nil {
+		t.Fatal("expected org number mismatch error")
+	}
+	if !strings.Contains(err.Error(), "client certificate org number does not match orgnr") {
+		t.Fatalf("unexpected error: %v", err)
 	}
 }
 

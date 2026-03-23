@@ -97,6 +97,28 @@ MOCK_BOLAGSVERKET_API_KEY=secret go run ./cmd/mock-bolagsverket
 REDOFRI_SUBMISSION_BASE_URL=http://127.0.0.1:8080 REDOFRI_SUBMISSION_API_KEY=secret redofri submit --sender-pnr 190001010106 --signer-pnr 198301019876 report.json
 ```
 
+Optional mTLS for the mock server:
+
+```
+./scripts/dev/generate-mock-mtls-certs.sh test-certs 5560001111
+
+MOCK_BOLAGSVERKET_TLS_CERT_FILE=test-certs/server.pem \
+MOCK_BOLAGSVERKET_TLS_KEY_FILE=test-certs/server-key.pem \
+MOCK_BOLAGSVERKET_TLS_CA_FILE=test-certs/ca.pem \
+MOCK_BOLAGSVERKET_REQUIRE_CLIENT_CERT=1 \
+go run ./cmd/mock-bolagsverket
+
+REDOFRI_SUBMISSION_BASE_URL=https://127.0.0.1:8080 \
+REDOFRI_SUBMISSION_CA_FILE=test-certs/ca.pem \
+REDOFRI_SUBMISSION_CLIENT_CERT_FILE=test-certs/client.pem \
+REDOFRI_SUBMISSION_CLIENT_KEY_FILE=test-certs/client-key.pem \
+go run ./cmd/redofri submit --sender-pnr 190001010106 --signer-pnr 198301019876 report.json
+```
+
+This is closer to the real Bolagsverket setup, where the API is reached over HTTPS and the client presents an organisationscertifikat during the TLS handshake.
+
+The helper script creates a client certificate with `serialNumber=16<orgnr>`. The mock server validates that this matches the `orgnr` in `skapa-inlamningtoken`, similar to the real Bolagsverket requirement described in the connection guide.
+
 The mock now follows the documented Bolagsverket endpoint pattern more closely:
 
 - `POST /hamta-arsredovisningsinformation/v1.1/skapa-inlamningtoken`

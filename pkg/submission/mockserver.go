@@ -3,6 +3,7 @@ package submission
 import (
 	"crypto/rand"
 	"crypto/sha256"
+	"crypto/x509/pkix"
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
@@ -78,6 +79,10 @@ func (s *mockServer) handleCreateTokenLike(w http.ResponseWriter, r *http.Reques
 	}
 	if strings.TrimSpace(req.OrgNumber) == "" {
 		writeJSONError(w, http.StatusBadRequest, "orgnr is required")
+		return
+	}
+	if !matchesClientCertificateOrgNumber(r, req.OrgNumber) {
+		writeJSONError(w, http.StatusForbidden, "client certificate org number does not match orgnr")
 		return
 	}
 	if strings.TrimSpace(req.SenderPersonalNumber) == "" {
@@ -325,4 +330,31 @@ func writeJSON(w http.ResponseWriter, status int, v any) {
 
 func writeJSONError(w http.ResponseWriter, status int, message string) {
 	writeJSON(w, status, map[string]string{"error": message})
+}
+
+func matchesClientCertificateOrgNumber(r *http.Request, orgNumber string) bool {
+	if r.TLS == nil || len(r.TLS.PeerCertificates) == 0 {
+		return true
+	}
+	cert := r.TLS.PeerCertificates[0]
+	serialOrgNumber := serialNumberOrgNumber(cert.Subject)
+	if serialOrgNumber == "" {
+		return false
+	}
+	return normalizeOrgNumber(serialOrgNumber) == normalizeOrgNumber(orgNumber)
+}
+
+func serialNumberOrgNumber(name pkix.Name) string {
+	serial := strings.TrimSpace(name.SerialNumber)
+	if serial == "" {
+		return ""
+	}
+	serial = strings.TrimPrefix(serial, "16")
+	return normalizeOrgNumber(serial)
+}
+
+func normalizeOrgNumber(value string) string {
+	value = strings.ReplaceAll(value, "-", "")
+	value = strings.ReplaceAll(value, " ", "")
+	return value
 }

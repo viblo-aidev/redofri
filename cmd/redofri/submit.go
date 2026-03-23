@@ -214,7 +214,11 @@ func (f submissionFlags) submitOptions() submission.SubmitOptions {
 }
 
 func newSubmissionService(baseURL, apiKey string) (*submission.Service, error) {
-	client, err := submission.NewHTTPClient(baseURL, nil, apiKey)
+	client, err := submission.NewHTTPClientWithTLS(baseURL, nil, apiKey, submission.ClientTLSConfig{
+		CertFile: os.Getenv("REDOFRI_SUBMISSION_CLIENT_CERT_FILE"),
+		KeyFile:  os.Getenv("REDOFRI_SUBMISSION_CLIENT_KEY_FILE"),
+		CAFile:   os.Getenv("REDOFRI_SUBMISSION_CA_FILE"),
+	})
 	if err != nil {
 		return nil, err
 	}
