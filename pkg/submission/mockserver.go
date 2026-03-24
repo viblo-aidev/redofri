@@ -3,12 +3,12 @@ package submission
 import (
 	"crypto/rand"
 	"crypto/sha256"
-	"crypto/x509/pkix"
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"slices"
 	"strings"
 	"sync"
 	"time"
@@ -17,6 +17,14 @@ import (
 const (
 	mockAgreementText = "Ett Eget utrymme har nu skapats for det foretag som du har angett."
 )
+
+var allowedClientCertificateRoots = []string{
+	"CN=ExpiTrust Test CA v8,O=Expisoft AB,C=SE",
+	"CN=ExpiTrust test CA v7,O=Expisoft AB,C=SE",
+	"CN=ExpiTrust EID CA v4,O=Expisoft AB,C=SE",
+	"CN=Steria AB EID CA v2,O=Steria AB,C=SE",
+	"CN=Redofri Mock CA,O=Redofri,C=SE",
+}
 
 // NewMockHandler returns a stateful HTTP handler for local submission testing.
 func NewMockHandler(apiKey string) http.Handler {
@@ -81,8 +89,8 @@ func (s *mockServer) handleCreateTokenLike(w http.ResponseWriter, r *http.Reques
 		writeJSONError(w, http.StatusBadRequest, "orgnr is required")
 		return
 	}
-	if !matchesClientCertificateOrgNumber(r, req.OrgNumber) {
-		writeJSONError(w, http.StatusForbidden, "client certificate org number does not match orgnr")
+	if err := validateClientCertificate(r, req.OrgNumber); err != nil {
+		writeJSONError(w, http.StatusForbidden, err.Error())
 		return
 	}
 	if strings.TrimSpace(req.SenderPersonalNumber) == "" {
@@ -332,25 +340,49 @@ func writeJSONError(w http.ResponseWriter, status int, message string) {
 	writeJSON(w, status, map[string]string{"error": message})
 }
 
-func matchesClientCertificateOrgNumber(r *http.Request, orgNumber string) bool {
+func validateClientCertificate(r *http.Request, orgNumber string) error {
 	if r.TLS == nil || len(r.TLS.PeerCertificates) == 0 {
-		return true
+		return nil
+	}
+	rootSubject := verifiedChainRootSubject(r)
+	if rootSubject == "" {
+		return fmt.Errorf("client certificate chain could not be verified")
+	}
+	if !slices.Contains(allowedClientCertificateRoots, rootSubject) {
+		return fmt.Errorf("client certificate root is not allowed: %s", rootSubject)
 	}
 	cert := r.TLS.PeerCertificates[0]
-	serialOrgNumber := serialNumberOrgNumber(cert.Subject)
-	if serialOrgNumber == "" {
-		return false
+	serial := strings.TrimSpace(cert.Subject.SerialNumber)
+	if !isValidClientSerialNumber(serial) {
+		return fmt.Errorf("client certificate serialNumber must be 16 followed by 10 digits")
 	}
-	return normalizeOrgNumber(serialOrgNumber) == normalizeOrgNumber(orgNumber)
+	if normalizeOrgNumber(serial[2:]) != normalizeOrgNumber(orgNumber) {
+		return fmt.Errorf("client certificate org number does not match orgnr")
+	}
+	return nil
 }
 
-func serialNumberOrgNumber(name pkix.Name) string {
-	serial := strings.TrimSpace(name.SerialNumber)
-	if serial == "" {
+func verifiedChainRootSubject(r *http.Request) string {
+	if r.TLS == nil || len(r.TLS.VerifiedChains) == 0 {
 		return ""
 	}
-	serial = strings.TrimPrefix(serial, "16")
-	return normalizeOrgNumber(serial)
+	chain := r.TLS.VerifiedChains[0]
+	if len(chain) == 0 {
+		return ""
+	}
+	return chain[len(chain)-1].Subject.String()
+}
+
+func isValidClientSerialNumber(serial string) bool {
+	if len(serial) != 12 || !strings.HasPrefix(serial, "16") {
+		return false
+	}
+	for _, ch := range serial[2:] {
+		if ch < '0' || ch > '9' {
+			return false
+		}
+	}
+	return true
 }
 
 func normalizeOrgNumber(value string) string {

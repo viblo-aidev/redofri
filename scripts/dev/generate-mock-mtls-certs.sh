@@ -9,7 +9,7 @@ mkdir -p "$OUT_DIR"
 openssl req -x509 -newkey rsa:2048 -days 3650 -nodes \
   -keyout "$OUT_DIR/ca-key.pem" \
   -out "$OUT_DIR/ca.pem" \
-  -subj "/CN=Redofri Mock CA/O=Redofri/C=SE"
+  -subj "/CN=ExpiTrust Test CA v8/O=Expisoft AB/C=SE"
 
 cat > "$OUT_DIR/server.cnf" <<EOF
 [ req ]
@@ -53,7 +53,7 @@ req_extensions = req_ext
 
 [ dn ]
 CN = Redofri Mock Client
-O = Redofri
+O = Example Client AB
 C = SE
 serialNumber = 16${ORG_NR}
 

@@ -117,7 +117,7 @@ go run ./cmd/redofri submit --sender-pnr 190001010106 --signer-pnr 198301019876 
 
 This is closer to the real Bolagsverket setup, where the API is reached over HTTPS and the client presents an organisationscertifikat during the TLS handshake.
 
-The helper script creates a client certificate with `serialNumber=16<orgnr>`. The mock server validates that this matches the `orgnr` in `skapa-inlamningtoken`, similar to the real Bolagsverket requirement described in the connection guide.
+The helper script creates a test CA with subject `CN=ExpiTrust Test CA v8,O=Expisoft AB,C=SE` and a client certificate with `serialNumber=16<orgnr>`. The mock server validates both the trusted root subject and that the serial-number org number matches the `orgnr` in `skapa-inlamningtoken`, similar to the real Bolagsverket requirement described in the connection guide.
 
 The mock now follows the documented Bolagsverket endpoint pattern more closely:
 

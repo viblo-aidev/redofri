@@ -47,6 +47,10 @@ func TestServerTLSConfigRequiresCAForClientCert(t *testing.T) {
 }
 
 func generateCA(t *testing.T) ([]byte, []byte, *x509.Certificate, *rsa.PrivateKey) {
+	return generateCustomCA(t, "ExpiTrust Test CA v8", "Expisoft AB")
+}
+
+func generateCustomCA(t *testing.T, cn, org string) ([]byte, []byte, *x509.Certificate, *rsa.PrivateKey) {
 	t.Helper()
 	key, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
@@ -54,7 +58,7 @@ func generateCA(t *testing.T) ([]byte, []byte, *x509.Certificate, *rsa.PrivateKe
 	}
 	tmpl := &x509.Certificate{
 		SerialNumber:          big.NewInt(1),
-		Subject:               pkix.Name{CommonName: "Test CA"},
+		Subject:               pkix.Name{CommonName: cn, Organization: []string{org}, Country: []string{"SE"}},
 		NotBefore:             time.Now().Add(-time.Hour),
 		NotAfter:              time.Now().Add(24 * time.Hour),
 		KeyUsage:              x509.KeyUsageCertSign | x509.KeyUsageCRLSign,
@@ -73,6 +77,10 @@ func generateCA(t *testing.T) ([]byte, []byte, *x509.Certificate, *rsa.PrivateKe
 }
 
 func generateLeaf(t *testing.T, caCert *x509.Certificate, caKey *rsa.PrivateKey, client bool) ([]byte, []byte) {
+	return generateLeafWithSerial(t, caCert, caKey, client, "165560001111")
+}
+
+func generateLeafWithSerial(t *testing.T, caCert *x509.Certificate, caKey *rsa.PrivateKey, client bool, serialNumber string) ([]byte, []byte) {
 	t.Helper()
 	key, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
@@ -84,7 +92,7 @@ func generateLeaf(t *testing.T, caCert *x509.Certificate, caKey *rsa.PrivateKey,
 	}
 	tmpl := &x509.Certificate{
 		SerialNumber: serial,
-		Subject:      pkix.Name{CommonName: "leaf", SerialNumber: "165560001111"},
+		Subject:      pkix.Name{CommonName: "leaf", Organization: []string{"Example Client AB"}, Country: []string{"SE"}, SerialNumber: serialNumber},
 		NotBefore:    time.Now().Add(-time.Hour),
 		NotAfter:     time.Now().Add(24 * time.Hour),
 		KeyUsage:     x509.KeyUsageDigitalSignature | x509.KeyUsageKeyEncipherment,

@@ -144,6 +144,87 @@ func TestMockServerClientCertificateOrgNumberMatch(t *testing.T) {
 	}
 }
 
+func TestMockServerRejectsUnexpectedCertificateRoot(t *testing.T) {
+	dir := t.TempDir()
+	caCertPEM, _, caCert, caKey := generateCA(t)
+	serverCertPEM, serverKeyPEM := generateLeaf(t, caCert, caKey, false)
+	rogueCAPEM, rogueCAKeyPEM, rogueCACert, rogueCAKey := generateCustomCA(t, "Rogue CA", "Rogue Org")
+	_ = rogueCAKeyPEM
+	clientCertPEM, clientKeyPEM := generateLeaf(t, rogueCACert, rogueCAKey, true)
+
+	caPath := writeBytes(t, dir, "ca.pem", caCertPEM)
+	rogueCAPath := writeBytes(t, dir, "rogue-ca.pem", rogueCAPEM)
+	serverCertPath := writeBytes(t, dir, "server.pem", serverCertPEM)
+	serverKeyPath := writeBytes(t, dir, "server.key", serverKeyPEM)
+	clientCertPath := writeBytes(t, dir, "client.pem", clientCertPEM)
+	clientKeyPath := writeBytes(t, dir, "client.key", clientKeyPEM)
+
+	httpServer := httptest.NewUnstartedServer(NewMockHandler(""))
+	t.Cleanup(httpServer.Close)
+	serverTLS, err := (ServerTLSConfig{CertFile: serverCertPath, KeyFile: serverKeyPath, CAFile: rogueCAPath, RequireClientCert: true}).TLS()
+	if err != nil {
+		t.Fatalf("server TLS: %v", err)
+	}
+	httpServer.TLS = serverTLS
+	httpServer.StartTLS()
+
+	client, err := NewHTTPClientWithTLS(httpServer.URL, httpServer.Client(), "", ClientTLSConfig{
+		CertFile: clientCertPath,
+		KeyFile:  clientKeyPath,
+		CAFile:   caPath,
+	})
+	if err != nil {
+		t.Fatalf("NewHTTPClientWithTLS: %v", err)
+	}
+
+	_, err = client.CreateToken(t.Context(), CreateTokenRequest{SenderPersonalNumber: "190001010106", OrgNumber: "556000-1111"})
+	if err == nil {
+		t.Fatal("expected certificate root rejection")
+	}
+	if !strings.Contains(err.Error(), "client certificate root is not allowed") {
+		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
+func TestMockServerRejectsInvalidSerialFormat(t *testing.T) {
+	dir := t.TempDir()
+	caCertPEM, _, caCert, caKey := generateCA(t)
+	serverCertPEM, serverKeyPEM := generateLeaf(t, caCert, caKey, false)
+	clientCertPEM, clientKeyPEM := generateLeafWithSerial(t, caCert, caKey, true, "bad-serial")
+
+	caPath := writeBytes(t, dir, "ca.pem", caCertPEM)
+	serverCertPath := writeBytes(t, dir, "server.pem", serverCertPEM)
+	serverKeyPath := writeBytes(t, dir, "server.key", serverKeyPEM)
+	clientCertPath := writeBytes(t, dir, "client.pem", clientCertPEM)
+	clientKeyPath := writeBytes(t, dir, "client.key", clientKeyPEM)
+
+	httpServer := httptest.NewUnstartedServer(NewMockHandler(""))
+	t.Cleanup(httpServer.Close)
+	serverTLS, err := (ServerTLSConfig{CertFile: serverCertPath, KeyFile: serverKeyPath, CAFile: caPath, RequireClientCert: true}).TLS()
+	if err != nil {
+		t.Fatalf("server TLS: %v", err)
+	}
+	httpServer.TLS = serverTLS
+	httpServer.StartTLS()
+
+	client, err := NewHTTPClientWithTLS(httpServer.URL, httpServer.Client(), "", ClientTLSConfig{
+		CertFile: clientCertPath,
+		KeyFile:  clientKeyPath,
+		CAFile:   caPath,
+	})
+	if err != nil {
+		t.Fatalf("NewHTTPClientWithTLS: %v", err)
+	}
+
+	_, err = client.CreateToken(t.Context(), CreateTokenRequest{SenderPersonalNumber: "190001010106", OrgNumber: "556000-1111"})
+	if err == nil {
+		t.Fatal("expected invalid serial rejection")
+	}
+	if !strings.Contains(err.Error(), "client certificate serialNumber must be 16 followed by 10 digits") {
+		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
 func doJSON[T any](t *testing.T, h http.Handler, method, path string, body any, apiKey string, wantStatus int) T {
 	t.Helper()
 	data, err := json.Marshal(body)
